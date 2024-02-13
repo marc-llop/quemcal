@@ -43,18 +43,53 @@ view model =
                 ]
     in
     Element.layout [ Background.color colors.black ]
-        (Element.column
-            [ height fill, width fill, spacing 1 ]
-            [ listColumn Pending
-                [ itemView { state = Pending, text = "Potatoes" }
-                , itemView { state = Pending, text = "Cucumbers" }
-                ]
-            , listColumn Completed
-                [ itemView { state = Completed, text = "Cockles" }
-                , itemView { state = Completed, text = "Tuna" }
+        (Element.column [ width fill, height fill ]
+            [ listHeaderView
+            , Element.column
+                [ height fill, width fill, spacing 1, Element.scrollbarX ]
+                [ listColumn Pending
+                    [ itemView { state = Pending, text = "Potatoes" }
+                    , itemView { state = Pending, text = "Cucumbers" }
+                    , itemView { state = Pending, text = "Bananas" }
+                    , itemView { state = Pending, text = "Tomatoes" }
+                    , itemView { state = Pending, text = "Onions" }
+                    , itemView { state = Pending, text = "Carrots" }
+                    , itemView { state = Pending, text = "Spinachs" }
+                    ]
+                , listColumn Completed
+                    [ itemView { state = Completed, text = "Cockles" }
+                    , itemView { state = Completed, text = "Tuna" }
+                    , itemView { state = Completed, text = "Salmon" }
+                    , itemView { state = Completed, text = "Haddock" }
+                    , itemView { state = Completed, text = "Cod" }
+                    ]
                 ]
             ]
         )
+
+
+listHeaderView =
+    let
+        headerIcon =
+            Element.el
+                [ width (px 32)
+                , Font.color colors.lightLime
+                ]
+                (Element.html Icons.arrowLeft)
+    in
+    Element.row
+        [ Element.paddingXY 20 20
+        , spacing 20
+        , Background.color colors.grey
+        , width fill
+        ]
+        [ headerIcon
+        , Element.el
+            [ Font.color colors.lightLime
+            , Font.bold
+            ]
+            (text "List title")
+        ]
 
 
 type ItemState
@@ -121,7 +156,7 @@ itemView item =
         [ width fill
         , Element.padding 20
         , Background.color backgroundColor
-        , Element.spacing 20
+        , Element.spacing 15
         ]
         [ itemCheckbox item
         , Element.el [] <| itemText item
