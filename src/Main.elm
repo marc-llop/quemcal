@@ -1,11 +1,11 @@
 module Main exposing (main)
 
 import Browser
-import HelloWorld exposing (helloWorld)
-import Html exposing (Html, div, img)
-import Html.Attributes exposing (src, style)
+import Element exposing (Element, paragraph, rgb255, text)
+import Element.Background as Background
+import Element.Font as Font
+import Html exposing (Html)
 import Msg exposing (Msg(..))
-import VitePluginHelper
 
 
 main : Program () Int Msg
@@ -25,7 +25,13 @@ update msg model =
 
 view : Int -> Html Msg
 view model =
-    div []
-        [ img [ src <| VitePluginHelper.asset "/src/assets/logo.png", style "width" "300px" ] []
-        , helloWorld model
-        ]
+    Element.layout [ Background.color colors.black ]
+        (paragraph [ Font.color colors.lime ] [ text "Hello world!" ])
+
+
+colors =
+    { black = rgb255 6 2 6
+    , grey = rgb255 10 2 10
+    , lime = rgb255 159 234 34
+    , lightLime = rgb255 214 246 162
+    }
