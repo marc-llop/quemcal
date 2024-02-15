@@ -42,8 +42,22 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    -- ShoppingList.shoppingListView marketShoppingList
-    ListSelection.listSelectionView (Dict.values model.shoppingLists)
+    let
+        listSelectionScreen =
+            ListSelection.listSelectionView (Dict.values model.shoppingLists)
+    in
+    case model.screen of
+        ListSelection ->
+            listSelectionScreen
+
+        ShoppingList l ->
+            Dict.get l model.shoppingLists
+                |> Maybe.map ShoppingList.shoppingListView
+                |> Maybe.withDefault listSelectionScreen
+
+
+
+-- ShoppingList.shoppingListView marketShoppingList
 
 
 marketShoppingList =
