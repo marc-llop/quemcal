@@ -69,7 +69,7 @@ itemView itemState item =
                     colors.black
 
                 Pending ->
-                    colors.grey
+                    colors.purple
     in
     Element.row
         [ width fill
@@ -95,7 +95,7 @@ listHeaderView listName =
     Element.row
         [ Element.paddingXY 20 20
         , spacing 20
-        , Background.color colors.grey
+        , Background.color colors.purple
         , width fill
         ]
         [ headerIcon
