@@ -1,7 +1,7 @@
 module ListSelection exposing (listSelectionView)
 
 import Design exposing (colors)
-import Element exposing (Element, fill, fillPortion, height, padding, paragraph, px, shrink, spacing, text, width)
+import Element exposing (Element, fill, fillPortion, height, padding, paddingEach, paragraph, px, shrink, spacing, text, width)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
@@ -50,15 +50,26 @@ listThumbnailView { name, completed, pending } =
         [ Border.rounded 10
         , Background.color colors.purple
         , padding 30
-        , spacing 15
+        , spacing 5
         , width fill
         , Font.color colors.lightLime
         , Font.glow colors.lime 2.0
         , Font.alignLeft
         ]
         [ Element.row [ width fill, spacing 20 ]
-            [ paragraph [ Element.alignLeft, width fill ] [ text name ]
-            , paragraph [ Element.alignRight, Element.alignBottom, width shrink ] [ text progressText ]
+            [ paragraph
+                [ Element.alignLeft
+                , width fill
+                , paddingEach { left = 0, right = 0, top = 0, bottom = 10 }
+                ]
+                [ text name ]
+            , paragraph
+                [ Element.alignRight
+                , Element.alignBottom
+                , width shrink
+                , Font.size 16
+                ]
+                [ text progressText ]
             ]
         , progressBarView progressPct
         ]
