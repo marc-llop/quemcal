@@ -71,16 +71,29 @@ itemView itemState item =
 
                 Pending ->
                     colors.purple
+
+        itemRow =
+            Element.row
+                [ width fill
+                , Element.padding 20
+                , Background.color backgroundColor
+                , Element.spacing 15
+                ]
+                [ itemCheckbox itemState
+                , Element.el [] <| itemText itemState item
+                ]
     in
-    Element.row
-        [ width fill
-        , Element.padding 20
-        , Background.color backgroundColor
-        , Element.spacing 15
-        ]
-        [ itemCheckbox itemState
-        , Element.el [] <| itemText itemState item
-        ]
+    Input.button
+        [ width fill ]
+        { onPress =
+            case itemState of
+                Completed ->
+                    Just (AddItem item)
+
+                Pending ->
+                    Just (CompleteItem item)
+        , label = itemRow
+        }
 
 
 listHeaderView : String -> Element Msg

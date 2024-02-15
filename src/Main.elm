@@ -5,7 +5,7 @@ import Dict exposing (Dict)
 import Html exposing (Html)
 import ListSelection
 import Msg exposing (Msg(..))
-import ShoppingList
+import ShoppingList exposing (ShoppingList)
 
 
 main : Program () Model Msg
@@ -30,6 +30,39 @@ initialModel =
     }
 
 
+mapShoppingList : String -> (ShoppingList -> ShoppingList) -> Model -> Model
+mapShoppingList listName mapper model =
+    { model
+        | shoppingLists = Dict.update listName (Maybe.map mapper) model.shoppingLists
+    }
+
+
+mapCurrentShoppingList : (ShoppingList -> ShoppingList) -> Model -> Model
+mapCurrentShoppingList mapper model =
+    case model.screen of
+        ShoppingList list ->
+            mapShoppingList list mapper model
+
+        _ ->
+            model
+
+
+completeItem : String -> ShoppingList -> ShoppingList
+completeItem item list =
+    { list
+        | pending = List.filter (\i -> i /= item) list.pending
+        , completed = item :: list.completed
+    }
+
+
+addItem : String -> ShoppingList -> ShoppingList
+addItem item list =
+    { list
+        | completed = List.filter (\i -> i /= item) list.completed
+        , pending = item :: list.pending
+    }
+
+
 update : Msg -> Model -> Model
 update msg model =
     case msg of
@@ -38,6 +71,12 @@ update msg model =
 
         BackToListSelection ->
             { model | screen = ListSelection }
+
+        CompleteItem item ->
+            mapCurrentShoppingList (completeItem item) model
+
+        AddItem item ->
+            mapCurrentShoppingList (addItem item) model
 
 
 view : Model -> Html Msg
