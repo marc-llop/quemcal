@@ -1,31 +1,49 @@
 module Main exposing (main)
 
 import Browser
+import Dict exposing (Dict)
 import Html exposing (Html)
 import ListSelection
 import Msg exposing (Msg(..))
 import ShoppingList
 
 
-main : Program () Int Msg
+main : Program () Model Msg
 main =
-    Browser.sandbox { init = 0, update = update, view = view }
+    Browser.sandbox { init = initialModel, update = update, view = view }
 
 
-update : Msg -> number -> number
+type Screen
+    = ListSelection
+    | ShoppingList String
+
+
+type alias Model =
+    { screen : Screen
+    , shoppingLists : Dict String ShoppingList.ShoppingList
+    }
+
+
+initialModel =
+    { screen = ListSelection
+    , shoppingLists = shoppingLists
+    }
+
+
+update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Increment ->
-            model + 1
+        SelectList l ->
+            { model | screen = ShoppingList l }
 
-        Decrement ->
-            model - 1
+        BackToListSelection ->
+            { model | screen = ListSelection }
 
 
-view : Int -> Html Msg
+view : Model -> Html Msg
 view model =
     -- ShoppingList.shoppingListView marketShoppingList
-    ListSelection.listSelectionView shoppingLists
+    ListSelection.listSelectionView (Dict.values model.shoppingLists)
 
 
 marketShoppingList =
@@ -60,3 +78,5 @@ shoppingLists =
     , { name = "Empty list", pending = [], completed = [] }
     , { name = "Half-done list", pending = [ "Make the app work" ], completed = [ "Make some screens" ] }
     ]
+        |> List.map (\sl -> ( sl.name, sl ))
+        |> Dict.fromList
