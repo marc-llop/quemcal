@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html)
+import ListSelection
 import Msg exposing (Msg(..))
 import ShoppingList
 
@@ -23,25 +24,32 @@ update msg model =
 
 view : Int -> Html Msg
 view model =
-    ShoppingList.shoppingListView shoppingList
+    -- ShoppingList.shoppingListView shoppingList
+    ListSelection.listSelectionView shoppingLists
 
 
-shoppingList =
-    { name = "List title"
-    , pending =
-        [ "Potatoes"
-        , "Cucumbers"
-        , "Bananas"
-        , "Tomatoes"
-        , "Onions"
-        , "Carrots"
-        , "Spinachs"
-        ]
-    , completed =
-        [ "Cockles"
-        , "Tuna"
-        , "Salmon"
-        , "Haddock"
-        , "Cod"
-        ]
-    }
+shoppingLists =
+    [ { name = "Market"
+      , pending =
+            [ "Cockles"
+            , "Squid"
+            , "Salmon"
+            , "Haddock"
+            , "Cod"
+            ]
+      , completed =
+            [ "Potatoes"
+            , "Cucumbers"
+            , "Bananas"
+            , "Tomatoes"
+            , "Onions"
+            , "Carrots"
+            , "Spinachs"
+            ]
+      }
+    , { name = "Groceries"
+      , pending = [ "Cookies", "Bread", "Milk" ]
+      , completed = [ "Pizza", "Frankfurts" ]
+      }
+    , { name = "Don't put preservatives in food, it's gross.", pending = [ "Tuna", "Olives", "Asparagus", "Pickled onions" ], completed = [] }
+    ]
