@@ -4,9 +4,10 @@ import Design exposing (colors, fabMargin)
 import Element exposing (Element, fill, height, px, spacing, text, width)
 import Element.Background as Background
 import Element.Font as Font
+import Element.Input as Input
 import Html exposing (Html)
 import Icons
-import Msg exposing (Msg)
+import Msg exposing (Msg(..))
 
 
 type alias Item =
@@ -98,7 +99,10 @@ listHeaderView listName =
         , Background.color colors.purple
         , width fill
         ]
-        [ headerIcon
+        [ Input.button []
+            { onPress = Just BackToListSelection
+            , label = headerIcon
+            }
         , Element.el
             [ Font.color colors.lightLime
             , Font.bold
