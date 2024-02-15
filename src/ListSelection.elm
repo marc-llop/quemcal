@@ -5,8 +5,9 @@ import Element exposing (Element, fill, fillPortion, height, padding, paddingEac
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Element.Input as Input
 import Html exposing (Html)
-import Msg exposing (Msg)
+import Msg exposing (Msg(..))
 import ShoppingList exposing (ShoppingList)
 
 
@@ -75,6 +76,15 @@ listThumbnailView { name, completed, pending } =
         ]
 
 
+listThumbnailButtonView : ShoppingList -> Element Msg
+listThumbnailButtonView shoppingList =
+    Input.button
+        [ width fill ]
+        { onPress = Just (SelectList shoppingList.name)
+        , label = listThumbnailView shoppingList
+        }
+
+
 listSelectionView : List ShoppingList -> Html Msg
 listSelectionView lists =
     Element.layout [ Background.color colors.black ]
@@ -89,7 +99,7 @@ listSelectionView lists =
                 , spacing 20
                 , padding 40
                 ]
-                (List.map listThumbnailView lists
+                (List.map listThumbnailButtonView lists
                     ++ [ fabMargin ]
                 )
             ]
