@@ -1,6 +1,6 @@
 module ShoppingList exposing (Item, ShoppingList, shoppingListView)
 
-import Design exposing (colors)
+import Design exposing (colors, fabMargin)
 import Element exposing (Element, fill, height, px, spacing, text, width)
 import Element.Background as Background
 import Element.Font as Font
@@ -134,6 +134,7 @@ shoppingListView { name, completed, pending } =
                     (List.map (itemView Pending) pending)
                 , listColumn Completed
                     (List.map (itemView Completed) completed)
+                , fabMargin
                 ]
             ]
         )

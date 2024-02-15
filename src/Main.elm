@@ -24,32 +24,39 @@ update msg model =
 
 view : Int -> Html Msg
 view model =
-    -- ShoppingList.shoppingListView shoppingList
+    -- ShoppingList.shoppingListView marketShoppingList
     ListSelection.listSelectionView shoppingLists
 
 
+marketShoppingList =
+    { name = "Market"
+    , pending =
+        [ "Cockles"
+        , "Squid"
+        , "Salmon"
+        , "Haddock"
+        , "Cod"
+        ]
+    , completed =
+        [ "Potatoes"
+        , "Cucumbers"
+        , "Bananas"
+        , "Tomatoes"
+        , "Onions"
+        , "Carrots"
+        , "Spinachs"
+        ]
+    }
+
+
 shoppingLists =
-    [ { name = "Market"
-      , pending =
-            [ "Cockles"
-            , "Squid"
-            , "Salmon"
-            , "Haddock"
-            , "Cod"
-            ]
-      , completed =
-            [ "Potatoes"
-            , "Cucumbers"
-            , "Bananas"
-            , "Tomatoes"
-            , "Onions"
-            , "Carrots"
-            , "Spinachs"
-            ]
-      }
+    [ marketShoppingList
     , { name = "Groceries"
       , pending = [ "Cookies", "Bread", "Milk" ]
       , completed = [ "Pizza", "Frankfurts" ]
       }
     , { name = "Don't put preservatives in food, it's gross.", pending = [ "Tuna", "Olives", "Asparagus", "Pickled onions" ], completed = [] }
+    , { name = "Completed list", pending = [], completed = [ "Style ListSelection view" ] }
+    , { name = "Empty list", pending = [], completed = [] }
+    , { name = "Half-done list", pending = [ "Make the app work" ], completed = [ "Make some screens" ] }
     ]

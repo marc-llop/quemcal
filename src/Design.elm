@@ -1,6 +1,14 @@
-module Design exposing (colors)
+module Design exposing (colors, fabMargin)
 
 import Element exposing (rgb255)
+
+
+fabMargin =
+    Element.el
+        [ Element.height (Element.px 70)
+        , Element.width Element.fill
+        ]
+        Element.none
 
 
 colors =
