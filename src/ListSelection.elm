@@ -1,6 +1,6 @@
 module ListSelection exposing (listSelectionView)
 
-import Design exposing (colors)
+import Design exposing (colors, fabMargin)
 import Element exposing (Element, fill, fillPortion, height, padding, paddingEach, paragraph, px, shrink, spacing, text, width)
 import Element.Background as Background
 import Element.Border as Border
@@ -79,10 +79,18 @@ listSelectionView : List ShoppingList -> Html Msg
 listSelectionView lists =
     Element.layout [ Background.color colors.black ]
         (Element.column
-            [ width fill
+            [ Background.color colors.black
             , height fill
-            , spacing 20
-            , padding 40
             ]
-            (List.map listThumbnailView lists)
+            [ Element.column
+                [ Element.scrollbarY
+                , width fill
+                , height fill
+                , spacing 20
+                , padding 40
+                ]
+                (List.map listThumbnailView lists
+                    ++ [ fabMargin ]
+                )
+            ]
         )
