@@ -79,7 +79,10 @@ update msg model =
             mapCurrentShoppingList (addItem item) model
 
         OpenItemCreator ->
-            model
+            Debug.todo "OpenItemCreator"
+
+        OpenListCreator ->
+            Debug.todo "OpenListCreator"
 
 
 view : Model -> Html Msg

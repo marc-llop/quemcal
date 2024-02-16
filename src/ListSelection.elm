@@ -1,6 +1,6 @@
 module ListSelection exposing (listSelectionView)
 
-import Design exposing (colors, fabMargin)
+import Design exposing (colors, fabMargin, floatingActionButton)
 import Element exposing (Element, fill, fillPortion, height, padding, paddingEach, paragraph, px, shrink, spacing, text, width)
 import Element.Background as Background
 import Element.Border as Border
@@ -87,7 +87,10 @@ listThumbnailButtonView shoppingList =
 
 listSelectionView : List ShoppingList -> Html Msg
 listSelectionView lists =
-    Element.layout [ Background.color colors.black ]
+    Element.layout
+        [ Background.color colors.black
+        , floatingActionButton OpenListCreator
+        ]
         (Element.column
             [ Background.color colors.black
             , height fill

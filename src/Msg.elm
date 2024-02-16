@@ -7,3 +7,4 @@ type Msg
     | CompleteItem String
     | AddItem String
     | OpenItemCreator
+    | OpenListCreator
