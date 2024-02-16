@@ -1,11 +1,12 @@
 module ShoppingList exposing (Item, ShoppingList, shoppingListView)
 
 import Design exposing (colors, fabMargin)
-import Element exposing (Element, fill, height, px, spacing, text, width)
+import Element exposing (Element, fill, height, maximum, px, shrink, spacing, text, width)
 import Element.Background as Background
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
+import Html.Attributes
 import Icons
 import Msg exposing (Msg(..))
 
@@ -96,6 +97,22 @@ itemView itemState item =
         }
 
 
+
+-- Stolen from https://github.com/rob-sokolowski/site/pull/52.
+-- Check issue for more information: https://github.com/mdgriffith/elm-ui/issues/112
+
+
+textWithEllipsis : String -> Element Msg
+textWithEllipsis displayText =
+    Element.html
+        (Html.div
+            [ Html.Attributes.style "text-overflow" "ellipsis"
+            , Html.Attributes.style "overflow" "hidden"
+            ]
+            [ Html.text displayText ]
+        )
+
+
 listHeaderView : String -> Element Msg
 listHeaderView listName =
     let
@@ -108,19 +125,19 @@ listHeaderView listName =
     in
     Element.row
         [ Element.paddingXY 20 20
-        , spacing 20
         , Background.color colors.purple
         , width fill
+        , height shrink
+        , Font.color colors.lightLime
+        , Font.bold
+        , Font.alignLeft
         ]
         [ Input.button []
             { onPress = Just BackToListSelection
             , label = headerIcon
             }
-        , Element.el
-            [ Font.color colors.lightLime
-            , Font.bold
-            ]
-            (text listName)
+        , Element.el [ width (px 20) ] Element.none
+        , textWithEllipsis listName
         ]
 
 
