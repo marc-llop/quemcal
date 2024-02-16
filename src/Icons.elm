@@ -2,6 +2,7 @@ module Icons exposing
     ( arrowLeft
     , checkSquare
     , edit2
+    , plus
     , square
     , trash2
     )

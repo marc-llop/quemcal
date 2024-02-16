@@ -6,3 +6,4 @@ type Msg
     | BackToListSelection
     | CompleteItem String
     | AddItem String
+    | OpenItemCreator

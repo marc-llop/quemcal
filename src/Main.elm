@@ -78,6 +78,9 @@ update msg model =
         AddItem item ->
             mapCurrentShoppingList (addItem item) model
 
+        OpenItemCreator ->
+            model
+
 
 view : Model -> Html Msg
 view model =

@@ -1,7 +1,7 @@
 module ShoppingList exposing (Item, ShoppingList, shoppingListView)
 
-import Design exposing (colors, fabMargin)
-import Element exposing (Element, fill, height, maximum, px, shrink, spacing, text, width)
+import Design exposing (colors, fabMargin, floatingActionButton)
+import Element exposing (Element, fill, height, px, shrink, spacing, text, width)
 import Element.Background as Background
 import Element.Font as Font
 import Element.Input as Input
@@ -119,7 +119,7 @@ listHeaderView listName =
         headerIcon =
             Element.el
                 [ width (px 32)
-                , Font.color colors.lightLime
+                , Font.color colors.lime
                 ]
                 (Element.html Icons.arrowLeft)
     in
@@ -128,7 +128,7 @@ listHeaderView listName =
         , Background.color colors.purple
         , width fill
         , height shrink
-        , Font.color colors.lightLime
+        , Font.color colors.lime
         , Font.bold
         , Font.alignLeft
         ]
@@ -159,7 +159,10 @@ shoppingListView { name, completed, pending } =
                 , spacing 1
                 ]
     in
-    Element.layout [ Background.color colors.black ]
+    Element.layout
+        [ Background.color colors.black
+        , floatingActionButton OpenItemCreator
+        ]
         (Element.column [ width fill, height fill ]
             [ listHeaderView name
             , Element.column
