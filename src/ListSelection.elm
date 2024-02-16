@@ -87,6 +87,10 @@ listThumbnailButtonView shoppingList =
 
 listSelectionView : List ShoppingList -> Html Msg
 listSelectionView lists =
+    let
+        sortedLists =
+            List.sortBy .name lists
+    in
     Element.layout
         [ Background.color colors.black
         , floatingActionButton OpenListCreator
@@ -102,7 +106,7 @@ listSelectionView lists =
                 , spacing 20
                 , padding 40
                 ]
-                (List.map listThumbnailButtonView lists
+                (List.map listThumbnailButtonView sortedLists
                     ++ [ fabMargin ]
                 )
             ]

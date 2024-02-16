@@ -144,6 +144,12 @@ listHeaderView listName =
 shoppingListView : ShoppingList -> Html Msg
 shoppingListView { name, completed, pending } =
     let
+        sortedCompleted =
+            List.sort completed
+
+        sortedPending =
+            List.sort pending
+
         backgroundColor state =
             case state of
                 Pending ->
@@ -168,9 +174,9 @@ shoppingListView { name, completed, pending } =
             , Element.column
                 [ height fill, width fill, spacing 1, Element.scrollbarX ]
                 [ listColumn Pending
-                    (List.map (itemView Pending) pending)
+                    (List.map (itemView Pending) sortedPending)
                 , listColumn Completed
-                    (List.map (itemView Completed) completed)
+                    (List.map (itemView Completed) sortedCompleted)
                 , fabMargin
                 ]
             ]
