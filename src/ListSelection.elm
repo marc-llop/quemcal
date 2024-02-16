@@ -6,6 +6,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import Element.Keyed as Keyed
 import Html exposing (Html)
 import Msg exposing (Msg(..))
 import ShoppingList exposing (ShoppingList)
@@ -90,6 +91,10 @@ listSelectionView lists =
     let
         sortedLists =
             List.sortBy .name lists
+
+        listToKeyedThumbnail : ShoppingList -> ( String, Element Msg )
+        listToKeyedThumbnail l =
+            ( l.name, listThumbnailButtonView l )
     in
     Element.layout
         [ Background.color colors.black
@@ -99,15 +104,15 @@ listSelectionView lists =
             [ Background.color colors.black
             , height fill
             ]
-            [ Element.column
+            [ Keyed.column
                 [ Element.scrollbarY
                 , width fill
                 , height fill
                 , spacing 20
                 , padding 40
                 ]
-                (List.map listThumbnailButtonView sortedLists
-                    ++ [ fabMargin ]
+                (List.map listToKeyedThumbnail sortedLists
+                    ++ [ ( "---fabMargin---", fabMargin ) ]
                 )
             ]
         )

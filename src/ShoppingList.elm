@@ -5,6 +5,7 @@ import Element exposing (Element, fill, height, px, shrink, spacing, text, width
 import Element.Background as Background
 import Element.Font as Font
 import Element.Input as Input
+import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
@@ -158,12 +159,17 @@ shoppingListView { name, completed, pending } =
                 Completed ->
                     colors.grey
 
-        listColumn state =
-            Element.column
+        itemToKeyedElement : ItemState -> Item -> ( String, Element Msg )
+        itemToKeyedElement state item =
+            ( item, itemView state item )
+
+        listColumn state list =
+            Keyed.column
                 [ width fill
                 , Background.color <| backgroundColor state
                 , spacing 1
                 ]
+                (List.map (itemToKeyedElement state) list)
     in
     Element.layout
         [ Background.color colors.black
@@ -173,10 +179,8 @@ shoppingListView { name, completed, pending } =
             [ listHeaderView name
             , Element.column
                 [ height fill, width fill, spacing 1, Element.scrollbarX ]
-                [ listColumn Pending
-                    (List.map (itemView Pending) sortedPending)
-                , listColumn Completed
-                    (List.map (itemView Completed) sortedCompleted)
+                [ listColumn Pending sortedPending
+                , listColumn Completed sortedCompleted
                 , fabMargin
                 ]
             ]
