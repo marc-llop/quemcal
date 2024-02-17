@@ -15,7 +15,9 @@ main =
 
 type Screen
     = ListSelection
+    | ListCreator String
     | ShoppingList String
+    | ItemCreator String String
 
 
 type alias Model =
@@ -89,16 +91,26 @@ view : Model -> Html Msg
 view model =
     let
         listSelectionScreen =
-            ListSelection.listSelectionView (Dict.values model.shoppingLists)
+            ListSelection.listSelectionPageView (Dict.values model.shoppingLists)
+
+        displayShoppingListWith : (ShoppingList -> Html Msg) -> String -> Html Msg
+        displayShoppingListWith shoppingListView shoppingListName =
+            Dict.get shoppingListName model.shoppingLists
+                |> Maybe.map shoppingListView
+                |> Maybe.withDefault listSelectionScreen
     in
     case model.screen of
         ListSelection ->
             listSelectionScreen
 
+        ListCreator l ->
+            listSelectionScreen
+
         ShoppingList l ->
-            Dict.get l model.shoppingLists
-                |> Maybe.map ShoppingList.shoppingListView
-                |> Maybe.withDefault listSelectionScreen
+            displayShoppingListWith ShoppingList.shoppingListPageView l
+
+        ItemCreator l item ->
+            displayShoppingListWith ShoppingList.shoppingListPageView l
 
 
 

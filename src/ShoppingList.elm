@@ -1,4 +1,4 @@
-module ShoppingList exposing (Item, ShoppingList, shoppingListView)
+module ShoppingList exposing (Item, ShoppingList, shoppingListPageView, shoppingListView)
 
 import Design exposing (colors, fabMargin, floatingActionButton)
 import Element exposing (Element, fill, height, px, shrink, spacing, text, width)
@@ -142,7 +142,7 @@ listHeaderView listName =
         ]
 
 
-shoppingListView : ShoppingList -> Html Msg
+shoppingListView : ShoppingList -> Element Msg
 shoppingListView { name, completed, pending } =
     let
         sortedCompleted =
@@ -171,17 +171,21 @@ shoppingListView { name, completed, pending } =
                 ]
                 (List.map (itemToKeyedElement state) list)
     in
+    Element.column [ width fill, height fill ]
+        [ listHeaderView name
+        , Element.column
+            [ height fill, width fill, spacing 1, Element.scrollbarX ]
+            [ listColumn Pending sortedPending
+            , listColumn Completed sortedCompleted
+            , fabMargin
+            ]
+        ]
+
+
+shoppingListPageView : ShoppingList -> Html Msg
+shoppingListPageView shoppingList =
     Element.layout
         [ Background.color colors.black
         , floatingActionButton OpenItemCreator
         ]
-        (Element.column [ width fill, height fill ]
-            [ listHeaderView name
-            , Element.column
-                [ height fill, width fill, spacing 1, Element.scrollbarX ]
-                [ listColumn Pending sortedPending
-                , listColumn Completed sortedCompleted
-                , fabMargin
-                ]
-            ]
-        )
+        (shoppingListView shoppingList)

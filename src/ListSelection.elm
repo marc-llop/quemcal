@@ -1,4 +1,4 @@
-module ListSelection exposing (listSelectionView)
+module ListSelection exposing (listSelectionPageView, listSelectionView)
 
 import Design exposing (colors, fabMargin, floatingActionButton)
 import Element exposing (Element, fill, fillPortion, height, padding, paddingEach, paragraph, px, shrink, spacing, text, width)
@@ -86,7 +86,7 @@ listThumbnailButtonView shoppingList =
         }
 
 
-listSelectionView : List ShoppingList -> Html Msg
+listSelectionView : List ShoppingList -> Element Msg
 listSelectionView lists =
     let
         sortedLists =
@@ -96,23 +96,27 @@ listSelectionView lists =
         listToKeyedThumbnail l =
             ( l.name, listThumbnailButtonView l )
     in
+    Element.column
+        [ Background.color colors.black
+        , height fill
+        ]
+        [ Keyed.column
+            [ Element.scrollbarY
+            , width fill
+            , height fill
+            , spacing 20
+            , padding 40
+            ]
+            (List.map listToKeyedThumbnail sortedLists
+                ++ [ ( "---fabMargin---", fabMargin ) ]
+            )
+        ]
+
+
+listSelectionPageView : List ShoppingList -> Html Msg
+listSelectionPageView lists =
     Element.layout
         [ Background.color colors.black
         , floatingActionButton OpenListCreator
         ]
-        (Element.column
-            [ Background.color colors.black
-            , height fill
-            ]
-            [ Keyed.column
-                [ Element.scrollbarY
-                , width fill
-                , height fill
-                , spacing 20
-                , padding 40
-                ]
-                (List.map listToKeyedThumbnail sortedLists
-                    ++ [ ( "---fabMargin---", fabMargin ) ]
-                )
-            ]
-        )
+        (listSelectionView lists)
