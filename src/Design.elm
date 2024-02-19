@@ -1,11 +1,11 @@
 module Design exposing (colors, fabMargin, floatingActionButton)
 
 import Element exposing (height, padding, px, rgb255, width)
-import Element.Background as Background
-import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
-import Icons
+import Html exposing (Html)
+import Svg exposing (svg)
+import Svg.Attributes as S
 
 
 fabMargin =
@@ -16,51 +16,47 @@ fabMargin =
         Element.none
 
 
+fabSize : Int
+fabSize =
+    80
+
+
+fabSizeStr =
+    String.fromInt fabSize
+
+
+plusCircleSvg : Html msg
+plusCircleSvg =
+    svg
+        [ S.height fabSizeStr
+        , S.width fabSizeStr
+        , S.viewBox "0 0 60 60"
+        , S.strokeLinecap "round"
+        , S.strokeLinejoin "round"
+        , S.strokeWidth "5"
+        , S.stroke "currentColor"
+        ]
+        [ Svg.defs []
+            [ Svg.mask [ S.id "cross" ]
+                [ Svg.rect [ S.x "0", S.y "0", S.width "60", S.height "60", S.fill "white" ] []
+                , Svg.line [ S.x1 "30", S.y1 "20", S.x2 "30", S.y2 "40", S.stroke "black" ] []
+                , Svg.line [ S.x1 "20", S.y1 "30", S.x2 "40", S.y2 "30", S.stroke "black" ] []
+                ]
+            ]
+        , Svg.circle [ S.cx "30", S.cy "30", S.r "25", S.mask "url(#cross)", S.fill "currentColor" ] []
+        ]
+
+
 floatingActionButton : msg -> Element.Attribute msg
 floatingActionButton onPress =
     let
-        outerGlow =
-            Element.el
-                [ height (px 60)
-                , width (px 60)
-                , Border.solid
-                , Border.width 2
-                , Border.rounded 30
-                , Border.glow colors.lime 2.0
-                ]
-                Element.none
-
-        innerGlow =
-            Element.el
-                [ height (px 60)
-                , width (px 60)
-                , Border.solid
-                , Border.width 2
-                , Border.color colors.lightLime
-                , Border.rounded 30
-                , Border.innerGlow colors.lime 1.0
-                ]
-                Element.none
-
-        plusIcon =
-            Element.el
-                [ Font.color colors.lightLime
-                , Element.centerX
-                , Element.centerY
-
-                -- , width (px 30)
-                -- , height (px 30)
-                ]
-                (Element.html Icons.plus)
-
         fab =
             Element.el
-                [ height (px 60)
-                , width (px 60)
-                , Element.behindContent outerGlow
-                , Element.behindContent innerGlow
+                [ height (px fabSize)
+                , width (px fabSize)
+                , Font.color colors.lime
                 ]
-                plusIcon
+                (Element.html plusCircleSvg)
 
         fabButton =
             Input.button
