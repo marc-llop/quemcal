@@ -80,7 +80,7 @@ listThumbnailView { name, completed, pending } =
 listThumbnailButtonView : ShoppingList -> Element Msg
 listThumbnailButtonView shoppingList =
     Input.button
-        [ width fill ]
+        [ width fill, Element.focused [] ]
         { onPress = Just (SelectList shoppingList.name)
         , label = listThumbnailView shoppingList
         }

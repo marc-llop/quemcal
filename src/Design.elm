@@ -57,20 +57,16 @@ floatingActionButton onPress =
                 , Font.color colors.lime
                 ]
                 (Element.html plusCircleSvg)
-
-        fabButton =
-            Input.button
-                []
-                { onPress = Just onPress
-                , label = fab
-                }
     in
-    Element.el
+    Input.button
         [ Element.alignRight
         , Element.alignBottom
         , padding 30
+        , Element.focused []
         ]
-        fabButton
+        { onPress = Just onPress
+        , label = fab
+        }
         |> Element.inFront
 
 

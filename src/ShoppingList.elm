@@ -86,7 +86,9 @@ itemView itemState item =
                 ]
     in
     Input.button
-        [ width fill ]
+        [ width fill
+        , Element.focused []
+        ]
         { onPress =
             case itemState of
                 Completed ->
@@ -133,7 +135,7 @@ listHeaderView listName =
         , Font.bold
         , Font.alignLeft
         ]
-        [ Input.button []
+        [ Input.button [ Element.focused [] ]
             { onPress = Just BackToListSelection
             , label = headerIcon
             }
