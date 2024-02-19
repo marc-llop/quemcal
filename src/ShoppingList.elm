@@ -116,31 +116,38 @@ textWithEllipsis displayText =
         )
 
 
-listHeaderView : String -> Element Msg
-listHeaderView listName =
+backButton : msg -> Element msg
+backButton message =
     let
-        headerIcon =
+        backIcon =
             Element.el
-                [ width (px 32)
+                [ width (px 64)
+                , height (px 64)
                 , Font.color colors.lime
+                , Element.paddingXY 20 20
                 ]
                 (Element.html Icons.arrowLeft)
     in
+    Input.button [ Element.focused [] ]
+        { onPress = Just message
+        , label = backIcon
+        }
+
+
+listHeaderView : String -> Element Msg
+listHeaderView listName =
     Element.row
-        [ Element.paddingXY 20 20
-        , Background.color colors.purple
+        [ Background.color colors.purple
         , width fill
         , height shrink
         , Font.color colors.lime
         , Font.bold
         , Font.alignLeft
         ]
-        [ Input.button [ Element.focused [] ]
-            { onPress = Just BackToListSelection
-            , label = headerIcon
-            }
-        , Element.el [ width (px 20) ] Element.none
+        [ backButton BackToListSelection
+        , Element.el [ width (px 5) ] Element.none
         , textWithEllipsis listName
+        , Element.el [ width (px 20) ] Element.none
         ]
 
 
