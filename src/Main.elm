@@ -3,9 +3,12 @@ module Main exposing (main)
 import Browser
 import Dict exposing (Dict)
 import Html exposing (Html)
+import ItemCreation
 import ListSelection
 import Msg exposing (Msg(..))
-import ShoppingList exposing (ShoppingList)
+import ShoppingList exposing (Item, ShoppingList)
+import SimpleTextIndex exposing (Index)
+import String.Normalize
 
 
 main : Program () Model Msg
@@ -15,20 +18,47 @@ main =
 
 type Screen
     = ListSelection
-    | ListCreator String
+    | ListCreation String
     | ShoppingList String
-    | ItemCreator String String
+    | ItemCreation String String
 
 
 type alias Model =
     { screen : Screen
     , shoppingLists : Dict String ShoppingList.ShoppingList
+    , itemIndex : Index Item
     }
+
+
+shoppingListsToItems : List ShoppingList -> List Item
+shoppingListsToItems lists =
+    List.concatMap
+        (\{ completed, pending } -> completed ++ pending)
+        lists
+
+
+populateIndex : Dict a ShoppingList -> Index Item -> Index Item
+populateIndex dict index =
+    shoppingListsToItems (Dict.values dict)
+        |> List.foldl SimpleTextIndex.add index
+
+
+itemToString : Item -> String
+itemToString a =
+    a
 
 
 initialModel =
     { screen = ListSelection
     , shoppingLists = shoppingLists
+    , itemIndex =
+        SimpleTextIndex.config
+            { ref = itemToString
+            , fields = [ itemToString ]
+            , normalize = String.toLower >> String.Normalize.removeDiacritics
+            }
+            |> SimpleTextIndex.new
+            |> populateIndex shoppingLists
     }
 
 
@@ -47,6 +77,11 @@ mapCurrentShoppingList mapper model =
 
         _ ->
             model
+
+
+mapItemIndex : (Index Item -> Index Item) -> Model -> Model
+mapItemIndex mapper model =
+    { model | itemIndex = mapper model.itemIndex }
 
 
 completeItem : String -> ShoppingList -> ShoppingList
@@ -79,12 +114,26 @@ update msg model =
 
         AddItem item ->
             mapCurrentShoppingList (addItem item) model
+                |> mapItemIndex (SimpleTextIndex.add item)
 
         OpenItemCreator ->
-            Debug.todo "OpenItemCreator"
+            case model.screen of
+                ShoppingList list ->
+                    { model | screen = ItemCreation list "" }
+
+                _ ->
+                    model
 
         OpenListCreator ->
             Debug.todo "OpenListCreator"
+
+        UpdateEditedItem updatedItem ->
+            case model.screen of
+                ItemCreation list _ ->
+                    { model | screen = ItemCreation list updatedItem }
+
+                _ ->
+                    model
 
 
 view : Model -> Html Msg
@@ -103,18 +152,14 @@ view model =
         ListSelection ->
             listSelectionScreen
 
-        ListCreator l ->
+        ListCreation l ->
             listSelectionScreen
 
         ShoppingList l ->
             displayShoppingListWith ShoppingList.shoppingListPageView l
 
-        ItemCreator l item ->
-            displayShoppingListWith ShoppingList.shoppingListPageView l
-
-
-
--- ShoppingList.shoppingListView marketShoppingList
+        ItemCreation l item ->
+            ItemCreation.itemCreationPageView model.itemIndex l item
 
 
 marketShoppingList =

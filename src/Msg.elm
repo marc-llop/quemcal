@@ -8,3 +8,4 @@ type Msg
     | AddItem String
     | OpenItemCreator
     | OpenListCreator
+    | UpdateEditedItem String
