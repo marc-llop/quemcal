@@ -4,7 +4,8 @@ import ModelTypes exposing (ShoppingListName)
 
 
 type Msg
-    = SelectList ShoppingListName
+    = NoOp
+    | SelectList ShoppingListName
     | BackToListSelection
     | CompleteItem String
     | AddItem String

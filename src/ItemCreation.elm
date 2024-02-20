@@ -1,4 +1,4 @@
-module ItemCreation exposing (itemCreationPageView)
+module ItemCreation exposing (itemCreationPageView, searchBarId)
 
 import Design exposing (backButton, colors)
 import Element exposing (Element, fill, height, px, shrink, width)
@@ -8,6 +8,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
 import Html exposing (Html)
+import Html.Attributes
 import Icons
 import ModelTypes exposing (Item, ShoppingList, ShoppingListName)
 import Msg exposing (Msg(..))
@@ -49,6 +50,11 @@ itemView item =
         }
 
 
+searchBarId : String
+searchBarId =
+    "search-bar"
+
+
 searchBar : Item -> Element Msg
 searchBar editedItem =
     Element.row
@@ -67,6 +73,8 @@ searchBar editedItem =
             , Border.width 0
             , Font.alignLeft
             , Element.centerY
+            , Input.focusedOnLoad
+            , Element.htmlAttribute (Html.Attributes.id searchBarId)
             ]
             { onChange = UpdateEditedItem
             , text = editedItem

@@ -1,16 +1,17 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Dom
 import Dict exposing (Dict)
 import Html exposing (Html)
-import ItemCreation
+import ItemCreation exposing (searchBarId)
 import ListSelection
 import ModelTypes exposing (Item, ShoppingList, ShoppingListName, shoppingListNameFromString, shoppingListNameToString)
 import Msg exposing (Msg(..))
 import Platform.Cmd as Cmd
 import ShoppingList
 import SimpleTextIndex exposing (Index)
-import String.Normalize
+import Task
 
 
 main : Program () Model Msg
@@ -125,6 +126,9 @@ addItem item list =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        NoOp ->
+            ( model, Cmd.none )
+
         SelectList l ->
             ( { model | screen = ShoppingList l }, Cmd.none )
 
@@ -143,7 +147,12 @@ update msg model =
         OpenItemCreator ->
             case model.screen of
                 ShoppingList list ->
-                    ( { model | screen = ItemCreation list "" }, Cmd.none )
+                    let
+                        focusSearchBar =
+                            Browser.Dom.focus searchBarId
+                                |> Task.attempt (\_ -> NoOp)
+                    in
+                    ( { model | screen = ItemCreation list "" }, focusSearchBar )
 
                 _ ->
                     ( model, Cmd.none )
