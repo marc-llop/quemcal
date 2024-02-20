@@ -3,6 +3,7 @@ module Icons exposing
     , checkSquare
     , edit2
     , plus
+    , search
     , square
     , trash2
     )
@@ -72,4 +73,12 @@ trash2 =
         , Svg.path [ d "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" ] []
         , Svg.line [ x1 "10", y1 "11", x2 "10", y2 "17" ] []
         , Svg.line [ x1 "14", y1 "11", x2 "14", y2 "17" ] []
+        ]
+
+
+search : Html msg
+search =
+    svgFeatherIcon "search"
+        [ Svg.circle [ cx "11", cy "11", r "8" ] []
+        , Svg.line [ x1 "21", y1 "21", x2 "16.65", y2 "16.65" ] []
         ]
