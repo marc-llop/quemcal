@@ -142,7 +142,7 @@ itemCreationPageView itemIndex editedItem shoppingList =
                 editedItem :: items
 
             else
-                items
+                []
     in
     Element.layout
         [ Background.color colors.black ]
