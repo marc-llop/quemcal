@@ -56,7 +56,7 @@ initialModel =
         SimpleTextIndex.config
             { ref = itemToString
             , fields = [ itemToString ]
-            , normalize = String.toLower >> String.Normalize.removeDiacritics
+            , normalize = ModelTypes.normalizeItem
             }
             |> SimpleTextIndex.new
             |> populateIndex shoppingLists
@@ -168,7 +168,7 @@ view model =
             displayShoppingListWith ShoppingList.shoppingListPageView l
 
         ItemCreation l item ->
-            ItemCreation.itemCreationPageView model.itemIndex l item
+            displayShoppingListWith (ItemCreation.itemCreationPageView model.itemIndex item) l
 
 
 marketShoppingList =

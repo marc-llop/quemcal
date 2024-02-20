@@ -1,7 +1,7 @@
 module ItemCreation exposing (itemCreationPageView)
 
 import Design exposing (backButton, colors)
-import Element exposing (Element, fill, height, maximum, px, shrink, width)
+import Element exposing (Element, fill, height, px, shrink, width)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
@@ -9,7 +9,7 @@ import Element.Input as Input
 import Element.Keyed as Keyed
 import Html exposing (Html)
 import Icons
-import ModelTypes exposing (Item, ShoppingListName)
+import ModelTypes exposing (Item, ShoppingList, ShoppingListName)
 import Msg exposing (Msg(..))
 import SimpleTextIndex exposing (Index)
 
@@ -117,13 +117,25 @@ itemCreationView items shoppingListName editedItem =
         ]
 
 
-itemCreationPageView : Index Item -> ShoppingListName -> Item -> Html Msg
-itemCreationPageView itemIndex shoppingListName editedItem =
+itemCreationPageView : Index Item -> Item -> ShoppingList -> Html Msg
+itemCreationPageView itemIndex editedItem shoppingList =
     let
+        itemIsNotPendingOrIsTheSame : Item -> Bool
+        itemIsNotPendingOrIsTheSame item =
+            let
+                isPending =
+                    List.member item shoppingList.pending
+
+                isTheSame =
+                    ModelTypes.normalizeItem item == ModelTypes.normalizeItem editedItem
+            in
+            not isPending || isTheSame
+
         items : List Item
         items =
             SimpleTextIndex.search editedItem itemIndex
+                |> List.filter itemIsNotPendingOrIsTheSame
     in
     Element.layout
         [ Background.color colors.black ]
-        (itemCreationView items shoppingListName editedItem)
+        (itemCreationView items shoppingList.name editedItem)

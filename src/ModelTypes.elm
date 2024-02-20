@@ -1,8 +1,15 @@
-module ModelTypes exposing (Item, ShoppingList, ShoppingListName, shoppingListNameFromString, shoppingListNameToString)
+module ModelTypes exposing (Item, ShoppingList, ShoppingListName, normalizeItem, shoppingListNameFromString, shoppingListNameToString)
+
+import String.Normalize
 
 
 type alias Item =
     String
+
+
+normalizeItem : Item -> String
+normalizeItem =
+    String.toLower >> String.Normalize.removeDiacritics
 
 
 type ShoppingListName
