@@ -135,7 +135,15 @@ itemCreationPageView itemIndex editedItem shoppingList =
         items =
             SimpleTextIndex.search editedItem itemIndex
                 |> List.filter itemIsNotPendingOrIsTheSame
+
+        itemsWithEdited : List Item
+        itemsWithEdited =
+            if editedItem /= "" then
+                editedItem :: items
+
+            else
+                items
     in
     Element.layout
         [ Background.color colors.black ]
-        (itemCreationView items shoppingList.name editedItem)
+        (itemCreationView itemsWithEdited shoppingList.name editedItem)
