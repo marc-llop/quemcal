@@ -7,6 +7,7 @@ import ItemCreation
 import ListSelection
 import ModelTypes exposing (Item, ShoppingList, ShoppingListName, shoppingListNameFromString, shoppingListNameToString)
 import Msg exposing (Msg(..))
+import Platform.Cmd as Cmd
 import ShoppingList
 import SimpleTextIndex exposing (Index)
 import String.Normalize
@@ -14,7 +15,16 @@ import String.Normalize
 
 main : Program () Model Msg
 main =
-    Browser.sandbox { init = initialModel, update = update, view = view }
+    Browser.element
+        { init = init
+        , update = update
+        , view = view
+        , subscriptions = \_ -> Sub.none
+        }
+
+
+type alias Flags =
+    ()
 
 
 type Screen
@@ -49,18 +59,21 @@ itemToString a =
     a
 
 
-initialModel =
-    { screen = ListSelection
-    , shoppingLists = shoppingLists
-    , itemIndex =
-        SimpleTextIndex.config
-            { ref = itemToString
-            , fields = [ itemToString ]
-            , normalize = ModelTypes.normalizeItem
-            }
-            |> SimpleTextIndex.new
-            |> populateIndex shoppingLists
-    }
+init : Flags -> ( Model, Cmd Msg )
+init _ =
+    ( { screen = ListSelection
+      , shoppingLists = shoppingLists
+      , itemIndex =
+            SimpleTextIndex.config
+                { ref = itemToString
+                , fields = [ itemToString ]
+                , normalize = ModelTypes.normalizeItem
+                }
+                |> SimpleTextIndex.new
+                |> populateIndex shoppingLists
+      }
+    , Cmd.none
+    )
 
 
 mapShoppingList : ShoppingListName -> (ShoppingList -> ShoppingList) -> Model -> Model
@@ -109,29 +122,31 @@ addItem item list =
     }
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectList l ->
-            { model | screen = ShoppingList l }
+            ( { model | screen = ShoppingList l }, Cmd.none )
 
         BackToListSelection ->
-            { model | screen = ListSelection }
+            ( { model | screen = ListSelection }, Cmd.none )
 
         CompleteItem item ->
-            mapCurrentShoppingList (completeItem item) model
+            ( mapCurrentShoppingList (completeItem item) model, Cmd.none )
 
         AddItem item ->
-            mapCurrentShoppingList (addItem item) model
+            ( mapCurrentShoppingList (addItem item) model
                 |> mapItemIndex (SimpleTextIndex.add item)
+            , Cmd.none
+            )
 
         OpenItemCreator ->
             case model.screen of
                 ShoppingList list ->
-                    { model | screen = ItemCreation list "" }
+                    ( { model | screen = ItemCreation list "" }, Cmd.none )
 
                 _ ->
-                    model
+                    ( model, Cmd.none )
 
         OpenListCreator ->
             Debug.todo "OpenListCreator"
@@ -139,10 +154,10 @@ update msg model =
         UpdateEditedItem updatedItem ->
             case model.screen of
                 ItemCreation list _ ->
-                    { model | screen = ItemCreation list updatedItem }
+                    ( { model | screen = ItemCreation list updatedItem }, Cmd.none )
 
                 _ ->
-                    model
+                    ( model, Cmd.none )
 
 
 view : Model -> Html Msg
