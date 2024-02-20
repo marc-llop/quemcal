@@ -6,11 +6,47 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import Element.Keyed as Keyed
 import Html exposing (Html)
 import Icons
 import Msg exposing (Msg(..))
 import ShoppingList exposing (Item)
 import SimpleTextIndex exposing (Index)
+
+
+itemText : String -> Element msg
+itemText item =
+    Element.el
+        [ width fill
+        , Font.color colors.lime
+        ]
+        (Element.text item)
+
+
+itemRow : Item -> Element msg
+itemRow item =
+    Element.row
+        [ width fill
+        , Element.padding 20
+        , Element.spacing 15
+        , Background.color colors.black
+        ]
+        [ Element.el
+            [ width (px 32) ]
+            (Element.html Icons.plus)
+        , Element.el [] <| itemText item
+        ]
+
+
+itemView : Item -> Element Msg
+itemView item =
+    Input.button
+        [ width fill
+        , Element.focused []
+        ]
+        { onPress = Just <| AddItem item
+        , label = itemRow item
+        }
 
 
 searchBar : Item -> Element Msg
@@ -61,10 +97,23 @@ itemCreationView items shoppingListName editedItem =
         [ Font.color colors.lime
         , width fill
         , height fill
+        , Background.color colors.black
         ]
         [ headerView shoppingListName editedItem
-        , Element.column []
-            (List.map Element.text items)
+        , Element.el
+            [ width fill
+            , height fill
+            , Background.color colors.black
+            , Element.scrollbarY
+            ]
+            (Keyed.column
+                [ width fill
+                , height shrink
+                , Background.color colors.grey
+                , Element.spacing 1
+                ]
+                (List.map (\i -> ( i, itemView i )) items)
+            )
         ]
 
 

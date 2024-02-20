@@ -44,7 +44,7 @@ itemText itemState item =
         (text item)
 
 
-itemCheckbox : ItemState -> Element Msg
+itemCheckbox : ItemState -> Element msg
 itemCheckbox itemState =
     let
         ( color, icon ) =
