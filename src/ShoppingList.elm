@@ -1,4 +1,4 @@
-module ShoppingList exposing (Item, ShoppingList, shoppingListPageView, shoppingListView)
+module ShoppingList exposing (shoppingListPageView, shoppingListView)
 
 import Design exposing (backButton, colors, fabMargin, floatingActionButton)
 import Element exposing (Element, fill, height, px, shrink, spacing, text, width)
@@ -9,18 +9,8 @@ import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
+import ModelTypes exposing (Item, ShoppingList, ShoppingListName, shoppingListNameToString)
 import Msg exposing (Msg(..))
-
-
-type alias Item =
-    String
-
-
-type alias ShoppingList =
-    { name : String
-    , completed : List Item
-    , pending : List Item
-    }
 
 
 type ItemState
@@ -116,7 +106,7 @@ textWithEllipsis displayText =
         )
 
 
-listHeaderView : String -> Element Msg
+listHeaderView : ShoppingListName -> Element Msg
 listHeaderView listName =
     Element.row
         [ Background.color colors.purple
@@ -128,7 +118,7 @@ listHeaderView listName =
         ]
         [ backButton BackToListSelection
         , Element.el [ width (px 5) ] Element.none
-        , textWithEllipsis listName
+        , textWithEllipsis <| shoppingListNameToString listName
         , Element.el [ width (px 20) ] Element.none
         ]
 

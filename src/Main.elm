@@ -5,8 +5,9 @@ import Dict exposing (Dict)
 import Html exposing (Html)
 import ItemCreation
 import ListSelection
+import ModelTypes exposing (Item, ShoppingList, ShoppingListName, shoppingListNameFromString, shoppingListNameToString)
 import Msg exposing (Msg(..))
-import ShoppingList exposing (Item, ShoppingList)
+import ShoppingList
 import SimpleTextIndex exposing (Index)
 import String.Normalize
 
@@ -18,14 +19,14 @@ main =
 
 type Screen
     = ListSelection
-    | ListCreation String
-    | ShoppingList String
-    | ItemCreation String String
+    | ListCreation ShoppingListName
+    | ShoppingList ShoppingListName
+    | ItemCreation ShoppingListName Item
 
 
 type alias Model =
     { screen : Screen
-    , shoppingLists : Dict String ShoppingList.ShoppingList
+    , shoppingLists : Dict String ShoppingList
     , itemIndex : Index Item
     }
 
@@ -62,10 +63,10 @@ initialModel =
     }
 
 
-mapShoppingList : String -> (ShoppingList -> ShoppingList) -> Model -> Model
+mapShoppingList : ShoppingListName -> (ShoppingList -> ShoppingList) -> Model -> Model
 mapShoppingList listName mapper model =
     { model
-        | shoppingLists = Dict.update listName (Maybe.map mapper) model.shoppingLists
+        | shoppingLists = Dict.update (shoppingListNameToString listName) (Maybe.map mapper) model.shoppingLists
     }
 
 
@@ -73,6 +74,9 @@ mapCurrentShoppingList : (ShoppingList -> ShoppingList) -> Model -> Model
 mapCurrentShoppingList mapper model =
     case model.screen of
         ShoppingList list ->
+            mapShoppingList list mapper model
+
+        ItemCreation list _ ->
             mapShoppingList list mapper model
 
         _ ->
@@ -142,9 +146,9 @@ view model =
         listSelectionScreen =
             ListSelection.listSelectionPageView (Dict.values model.shoppingLists)
 
-        displayShoppingListWith : (ShoppingList -> Html Msg) -> String -> Html Msg
+        displayShoppingListWith : (ShoppingList -> Html Msg) -> ShoppingListName -> Html Msg
         displayShoppingListWith shoppingListView shoppingListName =
-            Dict.get shoppingListName model.shoppingLists
+            Dict.get (shoppingListNameToString shoppingListName) model.shoppingLists
                 |> Maybe.map shoppingListView
                 |> Maybe.withDefault listSelectionScreen
     in
@@ -194,5 +198,13 @@ shoppingLists =
     , { name = "Empty list", pending = [], completed = [] }
     , { name = "Half-done list", pending = [ "Make the app work" ], completed = [ "Make some screens" ] }
     ]
-        |> List.map (\sl -> ( sl.name, sl ))
+        |> List.map
+            (\sl ->
+                ( sl.name
+                , { name = shoppingListNameFromString sl.name
+                  , completed = sl.completed
+                  , pending = sl.pending
+                  }
+                )
+            )
         |> Dict.fromList

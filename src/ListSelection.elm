@@ -8,8 +8,8 @@ import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
 import Html exposing (Html)
+import ModelTypes exposing (ShoppingList, shoppingListNameToString)
 import Msg exposing (Msg(..))
-import ShoppingList exposing (ShoppingList)
 
 
 progressBarView : Int -> Element msg
@@ -64,7 +64,7 @@ listThumbnailView { name, completed, pending } =
                 , width fill
                 , paddingEach { left = 0, right = 0, top = 0, bottom = 10 }
                 ]
-                [ text name ]
+                [ text <| shoppingListNameToString name ]
             , paragraph
                 [ Element.alignRight
                 , Element.alignBottom
@@ -90,11 +90,11 @@ listSelectionView : List ShoppingList -> Element Msg
 listSelectionView lists =
     let
         sortedLists =
-            List.sortBy .name lists
+            List.sortBy (.name >> shoppingListNameToString) lists
 
         listToKeyedThumbnail : ShoppingList -> ( String, Element Msg )
         listToKeyedThumbnail l =
-            ( l.name, listThumbnailButtonView l )
+            ( shoppingListNameToString l.name, listThumbnailButtonView l )
     in
     Element.column
         [ Background.color colors.black

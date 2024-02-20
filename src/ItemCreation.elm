@@ -9,8 +9,8 @@ import Element.Input as Input
 import Element.Keyed as Keyed
 import Html exposing (Html)
 import Icons
+import ModelTypes exposing (Item, ShoppingListName)
 import Msg exposing (Msg(..))
-import ShoppingList exposing (Item)
 import SimpleTextIndex exposing (Index)
 
 
@@ -77,7 +77,7 @@ searchBar editedItem =
         ]
 
 
-headerView : String -> Item -> Element Msg
+headerView : ShoppingListName -> Item -> Element Msg
 headerView shoppingListName editedItem =
     Element.row
         [ Background.color colors.purple
@@ -91,7 +91,7 @@ headerView shoppingListName editedItem =
         ]
 
 
-itemCreationView : List Item -> String -> Item -> Element Msg
+itemCreationView : List Item -> ShoppingListName -> Item -> Element Msg
 itemCreationView items shoppingListName editedItem =
     Element.column
         [ Font.color colors.lime
@@ -117,7 +117,7 @@ itemCreationView items shoppingListName editedItem =
         ]
 
 
-itemCreationPageView : Index Item -> String -> Item -> Html Msg
+itemCreationPageView : Index Item -> ShoppingListName -> Item -> Html Msg
 itemCreationPageView itemIndex shoppingListName editedItem =
     let
         items : List Item

@@ -1,8 +1,10 @@
 module Msg exposing (Msg(..))
 
+import ModelTypes exposing (ShoppingListName)
+
 
 type Msg
-    = SelectList String
+    = SelectList ShoppingListName
     | BackToListSelection
     | CompleteItem String
     | AddItem String
