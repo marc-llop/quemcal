@@ -1,6 +1,6 @@
 module ShoppingList exposing (Item, ShoppingList, shoppingListPageView, shoppingListView)
 
-import Design exposing (colors, fabMargin, floatingActionButton)
+import Design exposing (backButton, colors, fabMargin, floatingActionButton)
 import Element exposing (Element, fill, height, px, shrink, spacing, text, width)
 import Element.Background as Background
 import Element.Font as Font
@@ -116,24 +116,6 @@ textWithEllipsis displayText =
         )
 
 
-backButton : msg -> Element msg
-backButton message =
-    let
-        backIcon =
-            Element.el
-                [ width (px 64)
-                , height (px 64)
-                , Font.color colors.lime
-                , Element.paddingXY 20 20
-                ]
-                (Element.html Icons.arrowLeft)
-    in
-    Input.button [ Element.focused [] ]
-        { onPress = Just message
-        , label = backIcon
-        }
-
-
 listHeaderView : String -> Element Msg
 listHeaderView listName =
     Element.row
@@ -163,10 +145,10 @@ shoppingListView { name, completed, pending } =
         backgroundColor state =
             case state of
                 Pending ->
-                    colors.lightGrey
+                    colors.grey
 
                 Completed ->
-                    colors.grey
+                    colors.darkGrey
 
         itemToKeyedElement : ItemState -> Item -> ( String, Element Msg )
         itemToKeyedElement state item =

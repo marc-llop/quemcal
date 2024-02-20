@@ -1,9 +1,10 @@
-module Design exposing (colors, fabMargin, floatingActionButton)
+module Design exposing (backButton, colors, fabMargin, floatingActionButton)
 
-import Element exposing (height, padding, px, rgb255, width)
+import Element exposing (Element, height, padding, px, rgb255, width)
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
+import Icons
 import Svg exposing (svg)
 import Svg.Attributes as S
 
@@ -70,11 +71,29 @@ floatingActionButton onPress =
         |> Element.inFront
 
 
+backButton : msg -> Element msg
+backButton message =
+    let
+        backIcon =
+            Element.el
+                [ width (px 64)
+                , height (px 64)
+                , Font.color colors.lime
+                , Element.paddingXY 20 20
+                ]
+                (Element.html Icons.arrowLeft)
+    in
+    Input.button [ Element.focused [] ]
+        { onPress = Just message
+        , label = backIcon
+        }
+
+
 colors =
     { black = rgb255 6 2 6
-    , grey = rgb255 24 17 24
+    , darkGrey = rgb255 24 17 24
     , purple = rgb255 23 4 20
-    , lightGrey = rgb255 48 34 48
+    , grey = rgb255 48 34 48
     , lime = rgb255 159 234 34
     , lightLime = rgb255 214 246 162
     }
