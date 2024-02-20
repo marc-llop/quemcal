@@ -88,10 +88,15 @@ mapItemIndex mapper model =
     { model | itemIndex = mapper model.itemIndex }
 
 
+listWithout : Item -> List Item -> List Item
+listWithout item =
+    List.filter (\i -> i /= item)
+
+
 completeItem : String -> ShoppingList -> ShoppingList
 completeItem item list =
     { list
-        | pending = List.filter (\i -> i /= item) list.pending
+        | pending = listWithout item list.pending
         , completed = item :: list.completed
     }
 
@@ -99,8 +104,8 @@ completeItem item list =
 addItem : String -> ShoppingList -> ShoppingList
 addItem item list =
     { list
-        | completed = List.filter (\i -> i /= item) list.completed
-        , pending = item :: list.pending
+        | completed = listWithout item list.completed
+        , pending = item :: listWithout item list.pending
     }
 
 
