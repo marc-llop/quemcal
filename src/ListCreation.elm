@@ -2,7 +2,7 @@ module ListCreation exposing (listCreationPageView)
 
 import Design exposing (colors)
 import Dict exposing (values)
-import Element exposing (Element, fill, height, px, shrink, width)
+import Element exposing (Attribute, Element, fill, fillPortion, height, px, shrink, width)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
@@ -11,6 +11,7 @@ import Html exposing (Html)
 import ListSelection
 import ModelTypes exposing (ShoppingList)
 import Msg exposing (Msg(..))
+import String exposing (right)
 
 
 backdrop : Element msg -> Element msg
@@ -57,39 +58,77 @@ textInput value =
         }
 
 
+type ActionButton
+    = LeftCancel
+    | RightAccept
+
+
+actionButton :
+    ActionButton
+    ->
+        { onPress : Maybe msg
+        , label : Element msg
+        }
+    -> Element msg
+actionButton side =
+    let
+        ( bottomLeft, bottomRight, color ) =
+            case side of
+                LeftCancel ->
+                    ( 10, 0, colors.red )
+
+                RightAccept ->
+                    ( 0, 10, colors.lime )
+    in
+    Input.button
+        [ width (fillPortion 1)
+        , height fill
+        , Font.color color
+        , Border.color colors.grey
+        , Border.solid
+        , Border.width 1
+        , Border.roundEach
+            { topLeft = 0
+            , topRight = 0
+            , bottomLeft = bottomLeft
+            , bottomRight = bottomRight
+            }
+        ]
+
+
+buttonsRow : String -> Element Msg
+buttonsRow editedList =
+    Element.row
+        [ Border.roundEach
+            { topLeft = 0
+            , topRight = 0
+            , bottomLeft = 10
+            , bottomRight = 10
+            }
+        , width fill
+        , Element.clipX
+        , height (px 50)
+        ]
+        [ actionButton LeftCancel
+            { onPress = Just BackToListSelection
+            , label = Element.text "Cancel·la"
+            }
+        , actionButton RightAccept
+            { onPress = Just (AddList editedList)
+            , label = Element.text "Afegeix"
+            }
+        ]
+
+
 listCreationForm : String -> Element Msg
 listCreationForm editedList =
     Element.column
         [ Element.spacing 20
-
-        -- , Element.explain Debug.todo
         ]
         [ Element.el
             [ Element.padding 40 ]
             (textInput editedList)
-        , Element.row
-            [ Background.color colors.grey
-            , Border.roundEach
-                { topLeft = 0
-                , topRight = 0
-                , bottomLeft = 10
-                , bottomRight = 10
-                }
-            , width fill
-            , Element.clipX
-            , height (px 50)
-            ]
-            [ Input.button
-                []
-                { onPress = Just BackToListSelection
-                , label = Element.text "Cancel·la"
-                }
-            , Input.button
-                []
-                { onPress = Just (AddList editedList)
-                , label = Element.text "Afegeix"
-                }
-            ]
+        , buttonsRow editedList
         ]
 
 

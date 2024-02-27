@@ -97,4 +97,5 @@ colors =
     , grey = rgb255 48 34 48
     , lime = rgb255 159 234 34
     , lightLime = rgb255 214 246 162
+    , red = rgb255 236 82 50
     }
