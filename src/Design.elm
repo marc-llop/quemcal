@@ -1,6 +1,6 @@
 module Design exposing (backButton, colors, fabMargin, floatingActionButton)
 
-import Element exposing (Element, height, padding, px, rgb255, width)
+import Element exposing (Element, height, padding, px, rgb255, rgba255, width)
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
@@ -91,6 +91,7 @@ backButton message =
 
 colors =
     { black = rgb255 6 2 6
+    , backdropBlack = rgba255 6 2 6 0.8
     , darkGrey = rgb255 24 17 24
     , purple = rgb255 23 4 20
     , grey = rgb255 48 34 48

@@ -5,6 +5,7 @@ import Browser.Dom
 import Dict exposing (Dict)
 import Html exposing (Html)
 import ItemCreation exposing (searchBarId)
+import ListCreation
 import ListSelection
 import ModelTypes exposing (Item, ShoppingList, ShoppingListName, shoppingListNameFromString, shoppingListNameToString)
 import Msg exposing (Msg(..))
@@ -30,7 +31,7 @@ type alias Flags =
 
 type Screen
     = ListSelection
-    | ListCreation ShoppingListName
+    | ListCreation String
     | ShoppingList ShoppingListName
     | ItemCreation ShoppingListName Item
 
@@ -158,7 +159,12 @@ update msg model =
                     ( model, Cmd.none )
 
         OpenListCreator ->
-            Debug.todo "OpenListCreator"
+            case model.screen of
+                ListSelection ->
+                    ( { model | screen = ListCreation "" }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
         UpdateEditedItem updatedItem ->
             case model.screen of
@@ -168,25 +174,31 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        UpdateEditedList updatedList ->
+            ( model, Cmd.none )
+
+        AddList listName ->
+            ( model, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
     let
-        listSelectionScreen =
-            ListSelection.listSelectionPageView (Dict.values model.shoppingLists)
+        allShoppingLists =
+            Dict.values model.shoppingLists
 
         displayShoppingListWith : (ShoppingList -> Html Msg) -> ShoppingListName -> Html Msg
         displayShoppingListWith shoppingListView shoppingListName =
             Dict.get (shoppingListNameToString shoppingListName) model.shoppingLists
                 |> Maybe.map shoppingListView
-                |> Maybe.withDefault listSelectionScreen
+                |> Maybe.withDefault (ListSelection.listSelectionPageView allShoppingLists)
     in
     case model.screen of
         ListSelection ->
-            listSelectionScreen
+            ListSelection.listSelectionPageView allShoppingLists
 
         ListCreation l ->
-            listSelectionScreen
+            ListCreation.listCreationPageView allShoppingLists l
 
         ShoppingList l ->
             displayShoppingListWith ShoppingList.shoppingListPageView l

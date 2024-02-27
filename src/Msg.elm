@@ -12,3 +12,5 @@ type Msg
     | OpenItemCreator
     | OpenListCreator
     | UpdateEditedItem String
+    | UpdateEditedList String
+    | AddList String
