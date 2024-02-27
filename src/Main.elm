@@ -7,7 +7,7 @@ import Html exposing (Html)
 import ItemCreation exposing (searchBarId)
 import ListCreation
 import ListSelection
-import ModelTypes exposing (Item, ShoppingList, ShoppingListName, shoppingListNameFromString, shoppingListNameToString)
+import ModelTypes exposing (Item, ShoppingList, ShoppingListName, newShoppingList, shoppingListNameFromString, shoppingListNameToString)
 import Msg exposing (Msg(..))
 import Platform.Cmd as Cmd
 import ShoppingList
@@ -175,10 +175,31 @@ update msg model =
                     ( model, Cmd.none )
 
         UpdateEditedList updatedList ->
-            ( model, Cmd.none )
+            case model.screen of
+                ListCreation listName ->
+                    ( { model | screen = ListCreation updatedList }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
         AddList listName ->
-            ( model, Cmd.none )
+            case model.screen of
+                ListCreation _ ->
+                    let
+                        ( shoppingListName, shoppingList ) =
+                            newShoppingList listName
+                    in
+                    ( { model
+                        | screen = ShoppingList shoppingListName
+                        , shoppingLists = Dict.insert listName shoppingList model.shoppingLists
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 view : Model -> Html Msg

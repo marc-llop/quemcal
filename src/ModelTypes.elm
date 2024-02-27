@@ -1,4 +1,4 @@
-module ModelTypes exposing (Item, ShoppingList, ShoppingListName, normalizeItem, shoppingListNameFromString, shoppingListNameToString)
+module ModelTypes exposing (Item, ShoppingList, ShoppingListName, newShoppingList, normalizeItem, shoppingListNameFromString, shoppingListNameToString)
 
 import String.Normalize
 
@@ -31,3 +31,17 @@ type alias ShoppingList =
     , completed : List Item
     , pending : List Item
     }
+
+
+newShoppingList : String -> ( ShoppingListName, ShoppingList )
+newShoppingList nameString =
+    let
+        name =
+            shoppingListNameFromString nameString
+    in
+    ( name
+    , { name = name
+      , completed = []
+      , pending = []
+      }
+    )
