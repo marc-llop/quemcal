@@ -1,4 +1,4 @@
-module ShoppingList exposing (shoppingListPageView, shoppingListView)
+module ShoppingListPage exposing (shoppingListPageView, shoppingListView)
 
 import Design exposing (backButton, colors, fabMargin, floatingActionButton)
 import Element exposing (Element, fill, height, px, shrink, spacing, text, width)

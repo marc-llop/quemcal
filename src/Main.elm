@@ -10,7 +10,7 @@ import ListSelection
 import ModelTypes exposing (Item, ShoppingList, ShoppingListName, newShoppingList, shoppingListNameFromString, shoppingListNameToString)
 import Msg exposing (Msg(..))
 import Platform.Cmd as Cmd
-import ShoppingList
+import ShoppingListPage
 import SimpleTextIndex exposing (Index)
 import Task
 
@@ -222,7 +222,7 @@ view model =
             ListCreation.listCreationPageView allShoppingLists l
 
         ShoppingList l ->
-            displayShoppingListWith ShoppingList.shoppingListPageView l
+            displayShoppingListWith ShoppingListPage.shoppingListPageView l
 
         ItemCreation l item ->
             displayShoppingListWith (ItemCreation.itemCreationPageView model.itemIndex item) l
