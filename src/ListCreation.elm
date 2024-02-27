@@ -54,7 +54,7 @@ textInput value =
         { onChange = UpdateEditedList
         , text = value
         , placeholder = Nothing
-        , label = Input.labelAbove [ Font.alignLeft, Element.moveUp 10 ] <| Element.text "Doneu nom a la llista:"
+        , label = Input.labelAbove [ height (px 40), Font.alignLeft, Element.centerY ] <| Element.text "Doneu nom a la llista:"
         }
 
 
@@ -123,8 +123,7 @@ buttonsRow editedList =
 listCreationForm : String -> Element Msg
 listCreationForm editedList =
     Element.column
-        [ Element.spacing 20
-        ]
+        []
         [ Element.el
             [ Element.padding 40 ]
             (textInput editedList)
