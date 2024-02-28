@@ -1,4 +1,4 @@
-module Model.ShoppingList exposing (ItemState(..), ShoppingList, ShoppingListName, addItem, completedItems, newShoppingList, pendingItems, shoppingListNameToString, toggleItem)
+module Model.ShoppingList exposing (ItemState(..), ShoppingList, ShoppingListName, addItem, completedItems, listProgress, newShoppingList, pendingItems, shoppingListName, shoppingListNameToString, testData, toggleItem)
 
 import Dict exposing (Dict)
 import ModelTypes exposing (Item)
@@ -26,11 +26,18 @@ toggleItemState state =
 type alias Internals =
     { name : ShoppingListName
     , items : Dict Item ItemState
+    , total : Int
+    , completed : Int
     }
 
 
 type ShoppingListName
     = ShoppingListName String
+
+
+shoppingListName : ShoppingList -> ShoppingListName
+shoppingListName (ShoppingList { name }) =
+    name
 
 
 shoppingListNameToString : ShoppingListName -> String
@@ -53,6 +60,8 @@ newShoppingList nameString =
     , ShoppingList
         { name = name
         , items = Dict.empty
+        , total = 0
+        , completed = 0
         }
     )
 
@@ -86,21 +95,54 @@ mapItems mapper (ShoppingList internals) =
 
 
 toggleItem : Item -> ShoppingList -> ShoppingList
-toggleItem item shoppingList =
+toggleItem item (ShoppingList internals) =
     let
+        newCompleted =
+            case Dict.get item internals.items of
+                Nothing ->
+                    internals.completed
+
+                Just Completed ->
+                    internals.completed - 1
+
+                Just Pending ->
+                    internals.completed + 1
+
         toggleExisting =
             Maybe.map toggleItemState
     in
-    mapItems (Dict.update item toggleExisting) shoppingList
+    ShoppingList
+        { internals
+            | items = Dict.update item toggleExisting internals.items
+            , completed = newCompleted
+        }
 
 
 addItem : Item -> ShoppingList -> ShoppingList
-addItem item shoppingList =
+addItem item (ShoppingList internals) =
     let
-        addAsPending =
-            Maybe.andThen (always (Just Pending))
+        ( newCompleted, newTotal ) =
+            case Dict.get item internals.items of
+                Nothing ->
+                    ( internals.completed, internals.total + 1 )
+
+                Just Completed ->
+                    ( internals.completed - 1, internals.total )
+
+                Just Pending ->
+                    ( internals.completed, internals.total )
     in
-    mapItems (Dict.update item addAsPending) shoppingList
+    ShoppingList
+        { internals
+            | items = Dict.insert item Pending internals.items
+            , completed = newCompleted
+            , total = newTotal
+        }
+
+
+listProgress : ShoppingList -> { totalAmount : Int, completedAmount : Int }
+listProgress (ShoppingList { total, completed }) =
+    { totalAmount = total, completedAmount = completed }
 
 
 marketShoppingList =
@@ -157,6 +199,8 @@ testData =
                 , ShoppingList
                     { name = shoppingListNameFromString sl.name
                     , items = twoListsToDict sl
+                    , total = List.length sl.pending + List.length sl.completed
+                    , completed = List.length sl.completed
                     }
                 )
             )

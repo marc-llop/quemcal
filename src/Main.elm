@@ -7,7 +7,8 @@ import Html exposing (Html)
 import ItemCreation exposing (searchBarId)
 import ListCreation
 import ListSelection
-import ModelTypes exposing (Item, ShoppingList, ShoppingListName, newShoppingList, shoppingListNameFromString, shoppingListNameToString)
+import Model.ShoppingList exposing (ShoppingList, ShoppingListName, addItem, completedItems, newShoppingList, pendingItems, shoppingListNameToString, testData, toggleItem)
+import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 import Platform.Cmd as Cmd
 import ShoppingListPage
@@ -46,7 +47,7 @@ type alias Model =
 shoppingListsToItems : List ShoppingList -> List Item
 shoppingListsToItems lists =
     List.concatMap
-        (\{ completed, pending } -> completed ++ pending)
+        (\shoppingList -> completedItems shoppingList ++ pendingItems shoppingList)
         lists
 
 
@@ -64,7 +65,7 @@ itemToString a =
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     ( { screen = ListSelection
-      , shoppingLists = shoppingLists
+      , shoppingLists = testData
       , itemIndex =
             SimpleTextIndex.config
                 { ref = itemToString
@@ -72,7 +73,7 @@ init _ =
                 , normalize = ModelTypes.normalizeItem
                 }
                 |> SimpleTextIndex.new
-                |> populateIndex shoppingLists
+                |> populateIndex testData
       }
     , Cmd.none
     )
@@ -108,22 +109,6 @@ listWithout item =
     List.filter (\i -> i /= item)
 
 
-completeItem : String -> ShoppingList -> ShoppingList
-completeItem item list =
-    { list
-        | pending = listWithout item list.pending
-        , completed = item :: list.completed
-    }
-
-
-addItem : String -> ShoppingList -> ShoppingList
-addItem item list =
-    { list
-        | completed = listWithout item list.completed
-        , pending = item :: listWithout item list.pending
-    }
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -137,7 +122,7 @@ update msg model =
             ( { model | screen = ListSelection }, Cmd.none )
 
         CompleteItem item ->
-            ( mapCurrentShoppingList (completeItem item) model, Cmd.none )
+            ( mapCurrentShoppingList (toggleItem item) model, Cmd.none )
 
         AddItem item ->
             ( mapCurrentShoppingList (addItem item) model
@@ -226,47 +211,3 @@ view model =
 
         ItemCreation l item ->
             displayShoppingListWith (ItemCreation.itemCreationPageView model.itemIndex item) l
-
-
-marketShoppingList =
-    { name = "Market"
-    , pending =
-        [ "Cockles"
-        , "Squid"
-        , "Salmon"
-        , "Haddock"
-        , "Cod"
-        ]
-    , completed =
-        [ "Potatoes"
-        , "Cucumbers"
-        , "Bananas"
-        , "Tomatoes"
-        , "Onions"
-        , "Carrots"
-        , "Spinachs"
-        ]
-    }
-
-
-shoppingLists =
-    [ marketShoppingList
-    , { name = "Groceries"
-      , pending = [ "Cookies", "Bread", "Milk" ]
-      , completed = [ "Pizza", "Frankfurts" ]
-      }
-    , { name = "Don't put preservatives in food, it's gross.", pending = [ "Tuna", "Olives", "Asparagus", "Pickled onions" ], completed = [] }
-    , { name = "Completed list", pending = [], completed = [ "Style ListSelection view" ] }
-    , { name = "Empty list", pending = [], completed = [] }
-    , { name = "Half-done list", pending = [ "Make the app work" ], completed = [ "Make some screens" ] }
-    ]
-        |> List.map
-            (\sl ->
-                ( sl.name
-                , { name = shoppingListNameFromString sl.name
-                  , completed = sl.completed
-                  , pending = sl.pending
-                  }
-                )
-            )
-        |> Dict.fromList

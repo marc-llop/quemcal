@@ -10,7 +10,8 @@ import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
-import ModelTypes exposing (Item, ShoppingList, ShoppingListName)
+import Model.ShoppingList exposing (ShoppingList, ShoppingListName, pendingItems, shoppingListName)
+import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 import SimpleTextIndex exposing (Index)
 
@@ -132,7 +133,7 @@ itemCreationPageView itemIndex editedItem shoppingList =
         itemIsNotPendingOrIsTheSame item =
             let
                 isPending =
-                    List.member item shoppingList.pending
+                    List.member item (pendingItems shoppingList)
 
                 isTheSame =
                     ModelTypes.normalizeItem item == ModelTypes.normalizeItem editedItem
@@ -154,4 +155,4 @@ itemCreationPageView itemIndex editedItem shoppingList =
     in
     Element.layout
         [ Background.color colors.black ]
-        (itemCreationView itemsWithEdited shoppingList.name editedItem)
+        (itemCreationView itemsWithEdited (shoppingListName shoppingList) editedItem)

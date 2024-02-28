@@ -9,7 +9,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import ListSelection
-import ModelTypes exposing (ShoppingList)
+import Model.ShoppingList exposing (ShoppingList)
 import Msg exposing (Msg(..))
 import String exposing (right)
 

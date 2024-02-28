@@ -9,7 +9,8 @@ import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
-import ModelTypes exposing (Item, ShoppingList, ShoppingListName, shoppingListNameToString)
+import Model.ShoppingList exposing (ShoppingList, ShoppingListName, completedItems, pendingItems, shoppingListName, shoppingListNameToString)
+import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 
 
@@ -124,13 +125,13 @@ listHeaderView listName =
 
 
 shoppingListView : ShoppingList -> Element Msg
-shoppingListView { name, completed, pending } =
+shoppingListView shoppingList =
     let
         sortedCompleted =
-            List.sort completed
+            completedItems shoppingList |> List.sort
 
         sortedPending =
-            List.sort pending
+            pendingItems shoppingList |> List.sort
 
         backgroundColor state =
             case state of
@@ -153,7 +154,7 @@ shoppingListView { name, completed, pending } =
                 (List.map (itemToKeyedElement state) list)
     in
     Element.column [ width fill, height fill ]
-        [ listHeaderView name
+        [ listHeaderView (shoppingListName shoppingList)
         , Element.column
             [ height fill, width fill, spacing 1, Element.scrollbarX ]
             [ listColumn Pending sortedPending

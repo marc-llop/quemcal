@@ -8,7 +8,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
 import Html exposing (Html)
-import ModelTypes exposing (ShoppingList, shoppingListNameToString)
+import Model.ShoppingList exposing (ShoppingList, listProgress, shoppingListName, shoppingListNameToString)
 import Msg exposing (Msg(..))
 
 
@@ -34,13 +34,10 @@ progressBarView progressPct =
 
 
 listThumbnailView : ShoppingList -> Element Msg
-listThumbnailView { name, completed, pending } =
+listThumbnailView shoppingList =
     let
-        completedAmount =
-            List.length completed
-
-        totalAmount =
-            completedAmount + List.length pending
+        { completedAmount, totalAmount } =
+            listProgress shoppingList
 
         progressPct =
             (completedAmount * 100) // totalAmount
@@ -64,7 +61,7 @@ listThumbnailView { name, completed, pending } =
                 , width fill
                 , paddingEach { left = 0, right = 0, top = 0, bottom = 10 }
                 ]
-                [ text <| shoppingListNameToString name ]
+                [ text <| shoppingListNameToString (shoppingListName shoppingList) ]
             , paragraph
                 [ Element.alignRight
                 , Element.alignBottom
@@ -81,7 +78,7 @@ listThumbnailButtonView : ShoppingList -> Element Msg
 listThumbnailButtonView shoppingList =
     Input.button
         [ width fill, Element.focused [] ]
-        { onPress = Just (SelectList shoppingList.name)
+        { onPress = Just (SelectList (shoppingListName shoppingList))
         , label = listThumbnailView shoppingList
         }
 
@@ -90,11 +87,11 @@ listSelectionView : List ShoppingList -> Element Msg
 listSelectionView lists =
     let
         sortedLists =
-            List.sortBy (.name >> shoppingListNameToString) lists
+            List.sortBy (shoppingListName >> shoppingListNameToString) lists
 
         listToKeyedThumbnail : ShoppingList -> ( String, Element Msg )
         listToKeyedThumbnail l =
-            ( shoppingListNameToString l.name, listThumbnailButtonView l )
+            ( shoppingListName l |> shoppingListNameToString, listThumbnailButtonView l )
     in
     Element.column
         [ Background.color colors.black

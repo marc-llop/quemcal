@@ -1,6 +1,6 @@
 module Msg exposing (Msg(..))
 
-import ModelTypes exposing (ShoppingListName)
+import Model.ShoppingList exposing (ShoppingListName)
 
 
 type Msg
