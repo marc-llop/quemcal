@@ -8,7 +8,7 @@ import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
 import Html exposing (Html)
-import Model.ShoppingList exposing (ShoppingList, listProgress, shoppingListName, shoppingListNameToString)
+import Model.ShoppingList exposing (ShoppingList, listProgress, shoppingListID, shoppingListName)
 import Msg exposing (Msg(..))
 
 
@@ -61,7 +61,7 @@ listThumbnailView shoppingList =
                 , width fill
                 , paddingEach { left = 0, right = 0, top = 0, bottom = 10 }
                 ]
-                [ text <| shoppingListNameToString (shoppingListName shoppingList) ]
+                [ text <| shoppingListName shoppingList ]
             , paragraph
                 [ Element.alignRight
                 , Element.alignBottom
@@ -78,7 +78,7 @@ listThumbnailButtonView : ShoppingList -> Element Msg
 listThumbnailButtonView shoppingList =
     Input.button
         [ width fill, Element.focused [] ]
-        { onPress = Just (SelectList (shoppingListName shoppingList))
+        { onPress = Just (SelectList (shoppingListID shoppingList))
         , label = listThumbnailView shoppingList
         }
 
@@ -87,11 +87,11 @@ listSelectionView : List ShoppingList -> Element Msg
 listSelectionView lists =
     let
         sortedLists =
-            List.sortBy (shoppingListName >> shoppingListNameToString) lists
+            List.sortBy shoppingListName lists
 
         listToKeyedThumbnail : ShoppingList -> ( String, Element Msg )
         listToKeyedThumbnail l =
-            ( shoppingListName l |> shoppingListNameToString, listThumbnailButtonView l )
+            ( shoppingListName l, listThumbnailButtonView l )
     in
     Element.column
         [ Background.color colors.black

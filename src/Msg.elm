@@ -1,11 +1,11 @@
 module Msg exposing (Msg(..))
 
-import Model.ShoppingList exposing (ShoppingListName)
+import Model.ShoppingList exposing (ShoppingListID)
 
 
 type Msg
     = NoOp
-    | SelectList ShoppingListName
+    | SelectList ShoppingListID
     | BackToListSelection
     | CompleteItem String
     | AddItem String

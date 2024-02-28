@@ -10,7 +10,7 @@ import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
-import Model.ShoppingList exposing (ShoppingList, ShoppingListName, pendingItems, shoppingListName)
+import Model.ShoppingList exposing (ShoppingList, ShoppingListID, pendingItems, shoppingListID, shoppingListName)
 import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 import SimpleTextIndex exposing (Index)
@@ -86,29 +86,29 @@ searchBar editedItem =
         ]
 
 
-headerView : ShoppingListName -> Item -> Element Msg
-headerView shoppingListName editedItem =
+headerView : ShoppingListID -> Item -> Element Msg
+headerView shoppingListID editedItem =
     Element.row
         [ Background.color colors.purple
         , width fill
         , height (px 64)
         , Font.color colors.lime
         ]
-        [ backButton (SelectList shoppingListName)
+        [ backButton (SelectList shoppingListID)
         , searchBar editedItem
         , Element.el [ width (px 20) ] Element.none
         ]
 
 
-itemCreationView : List Item -> ShoppingListName -> Item -> Element Msg
-itemCreationView items shoppingListName editedItem =
+itemCreationView : List Item -> ShoppingListID -> Item -> Element Msg
+itemCreationView items shoppingListID editedItem =
     Element.column
         [ Font.color colors.lime
         , width fill
         , height fill
         , Background.color colors.black
         ]
-        [ headerView shoppingListName editedItem
+        [ headerView shoppingListID editedItem
         , Element.el
             [ width fill
             , height fill
@@ -155,4 +155,4 @@ itemCreationPageView itemIndex editedItem shoppingList =
     in
     Element.layout
         [ Background.color colors.black ]
-        (itemCreationView itemsWithEdited (shoppingListName shoppingList) editedItem)
+        (itemCreationView itemsWithEdited (shoppingListID shoppingList) editedItem)

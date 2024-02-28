@@ -7,7 +7,7 @@ import Html exposing (Html)
 import ItemCreation exposing (searchBarId)
 import ListCreation
 import ListSelection
-import Model.ShoppingList exposing (ShoppingList, ShoppingListName, addItem, completedItems, newShoppingList, pendingItems, shoppingListNameToString, testData, toggleItem)
+import Model.ShoppingList exposing (ShoppingList, ShoppingListID, addItem, completedItems, idToString, newShoppingList, pendingItems, shoppingListName, testData, toggleItem)
 import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 import Platform.Cmd as Cmd
@@ -33,8 +33,8 @@ type alias Flags =
 type Screen
     = ListSelection
     | ListCreation String
-    | ShoppingList ShoppingListName
-    | ItemCreation ShoppingListName Item
+    | ShoppingList ShoppingListID
+    | ItemCreation ShoppingListID Item
 
 
 type alias Model =
@@ -79,10 +79,10 @@ init _ =
     )
 
 
-mapShoppingList : ShoppingListName -> (ShoppingList -> ShoppingList) -> Model -> Model
-mapShoppingList listName mapper model =
+mapShoppingList : ShoppingListID -> (ShoppingList -> ShoppingList) -> Model -> Model
+mapShoppingList listID mapper model =
     { model
-        | shoppingLists = Dict.update (shoppingListNameToString listName) (Maybe.map mapper) model.shoppingLists
+        | shoppingLists = Dict.update (idToString listID) (Maybe.map mapper) model.shoppingLists
     }
 
 
@@ -193,9 +193,9 @@ view model =
         allShoppingLists =
             Dict.values model.shoppingLists
 
-        displayShoppingListWith : (ShoppingList -> Html Msg) -> ShoppingListName -> Html Msg
-        displayShoppingListWith shoppingListView shoppingListName =
-            Dict.get (shoppingListNameToString shoppingListName) model.shoppingLists
+        displayShoppingListWith : (ShoppingList -> Html Msg) -> ShoppingListID -> Html Msg
+        displayShoppingListWith shoppingListView shoppingListID =
+            Dict.get (idToString shoppingListID) model.shoppingLists
                 |> Maybe.map shoppingListView
                 |> Maybe.withDefault (ListSelection.listSelectionPageView allShoppingLists)
     in

@@ -1,6 +1,7 @@
-module Model.ShoppingList exposing (ItemState(..), ShoppingList, ShoppingListName, addItem, completedItems, listProgress, newShoppingList, pendingItems, shoppingListName, shoppingListNameToString, testData, toggleItem)
+module Model.ShoppingList exposing (ItemState(..), ShoppingList, ShoppingListID, addItem, completedItems, idToString, listProgress, newShoppingList, pendingItems, shoppingListID, shoppingListName, testData, toggleItem)
 
 import Dict exposing (Dict)
+import Html.Attributes exposing (id)
 import ModelTypes exposing (Item)
 
 
@@ -24,41 +25,48 @@ toggleItemState state =
 
 
 type alias Internals =
-    { name : ShoppingListName
+    { id : ShoppingListID
     , items : Dict Item ItemState
     , total : Int
     , completed : Int
     }
 
 
-type ShoppingListName
-    = ShoppingListName String
+type ShoppingListID
+    = ShoppingListID String
 
 
-shoppingListName : ShoppingList -> ShoppingListName
-shoppingListName (ShoppingList { name }) =
+shoppingListID : ShoppingList -> ShoppingListID
+shoppingListID (ShoppingList { id }) =
+    id
+
+
+idToString : ShoppingListID -> String
+idToString (ShoppingListID name) =
     name
 
 
-shoppingListNameToString : ShoppingListName -> String
-shoppingListNameToString (ShoppingListName name) =
-    name
+shoppingListName : ShoppingList -> String
+shoppingListName (ShoppingList { id }) =
+    case id of
+        ShoppingListID name ->
+            name
 
 
-shoppingListNameFromString : String -> ShoppingListName
-shoppingListNameFromString name =
-    ShoppingListName name
+shoppingListIDFromString : String -> ShoppingListID
+shoppingListIDFromString name =
+    ShoppingListID name
 
 
-newShoppingList : String -> ( ShoppingListName, ShoppingList )
+newShoppingList : String -> ( ShoppingListID, ShoppingList )
 newShoppingList nameString =
     let
-        name =
-            shoppingListNameFromString nameString
+        id =
+            shoppingListIDFromString nameString
     in
-    ( name
+    ( id
     , ShoppingList
-        { name = name
+        { id = id
         , items = Dict.empty
         , total = 0
         , completed = 0
@@ -197,7 +205,7 @@ testData =
             (\sl ->
                 ( sl.name
                 , ShoppingList
-                    { name = shoppingListNameFromString sl.name
+                    { id = shoppingListIDFromString sl.name
                     , items = twoListsToDict sl
                     , total = List.length sl.pending + List.length sl.completed
                     , completed = List.length sl.completed

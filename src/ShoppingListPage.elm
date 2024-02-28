@@ -9,7 +9,7 @@ import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
-import Model.ShoppingList exposing (ShoppingList, ShoppingListName, completedItems, pendingItems, shoppingListName, shoppingListNameToString)
+import Model.ShoppingList exposing (ShoppingList, completedItems, pendingItems, shoppingListName)
 import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 
@@ -107,7 +107,7 @@ textWithEllipsis displayText =
         )
 
 
-listHeaderView : ShoppingListName -> Element Msg
+listHeaderView : String -> Element Msg
 listHeaderView listName =
     Element.row
         [ Background.color colors.purple
@@ -119,7 +119,7 @@ listHeaderView listName =
         ]
         [ backButton BackToListSelection
         , Element.el [ width (px 5) ] Element.none
-        , textWithEllipsis <| shoppingListNameToString listName
+        , textWithEllipsis listName
         , Element.el [ width (px 20) ] Element.none
         ]
 
