@@ -1,4 +1,4 @@
-module ListCreation exposing (listCreationPageView)
+module ListCreation exposing (listCreationPageView, listNameInputId)
 
 import Design exposing (colors)
 import Dict exposing (values)
@@ -8,10 +8,10 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
+import Html.Attributes
 import ListSelection
 import Model.ShoppingList exposing (ShoppingList)
 import Msg exposing (Msg(..))
-import String exposing (right)
 
 
 backdrop : Element msg -> Element msg
@@ -38,6 +38,11 @@ modal child =
         child
 
 
+listNameInputId : String
+listNameInputId =
+    "list-name-input"
+
+
 textInput : String -> Element Msg
 textInput value =
     Input.text
@@ -50,6 +55,7 @@ textInput value =
         , Font.alignLeft
         , Font.color colors.lightLime
         , Font.glow colors.lime 1.0
+        , Element.htmlAttribute (Html.Attributes.id listNameInputId)
         ]
         { onChange = UpdateEditedList
         , text = value

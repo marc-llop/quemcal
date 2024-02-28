@@ -5,7 +5,7 @@ import Browser.Dom
 import Dict exposing (Dict)
 import Html exposing (Html)
 import ItemCreation exposing (searchBarId)
-import ListCreation
+import ListCreation exposing (listNameInputId)
 import ListSelection
 import Model.ShoppingList exposing (ShoppingList, ShoppingListID, addItem, completedItems, idToString, newShoppingList, pendingItems, shoppingListName, testData, toggleItem)
 import ModelTypes exposing (Item)
@@ -146,7 +146,12 @@ update msg model =
         OpenListCreator ->
             case model.screen of
                 ListSelection ->
-                    ( { model | screen = ListCreation "" }, Cmd.none )
+                    let
+                        focusListNameInput =
+                            Browser.Dom.focus listNameInputId
+                                |> Task.attempt (\_ -> NoOp)
+                    in
+                    ( { model | screen = ListCreation "" }, focusListNameInput )
 
                 _ ->
                     ( model, Cmd.none )
