@@ -104,9 +104,14 @@ mapItemIndex mapper model =
     { model | itemIndex = mapper model.itemIndex }
 
 
-listWithout : Item -> List Item -> List Item
-listWithout item =
-    List.filter (\i -> i /= item)
+cleanItemSearchInput : Model -> Model
+cleanItemSearchInput model =
+    case model.screen of
+        ItemCreation list _ ->
+            { model | screen = ItemCreation list "" }
+
+        _ ->
+            model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -127,6 +132,7 @@ update msg model =
         AddItem item ->
             ( mapCurrentShoppingList (addItem item) model
                 |> mapItemIndex (SimpleTextIndex.add item)
+                |> cleanItemSearchInput
             , Cmd.none
             )
 
