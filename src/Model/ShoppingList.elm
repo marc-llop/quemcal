@@ -1,4 +1,4 @@
-module Model.ShoppingList exposing (ItemState(..), ShoppingList, ShoppingListID, addItem, completedItems, idToString, listProgress, newShoppingList, pendingItems, shoppingListID, shoppingListName, testData, toggleItem)
+module Model.ShoppingList exposing (ItemPresence(..), ItemState(..), ShoppingList, ShoppingListID, addItem, completedItems, contains, idToString, listProgress, newShoppingList, pendingItems, shoppingListID, shoppingListName, testData, toggleItem)
 
 import Dict exposing (Dict)
 import Html.Attributes exposing (id)
@@ -100,6 +100,25 @@ pendingItems =
 mapItems : (Dict Item ItemState -> Dict Item ItemState) -> ShoppingList -> ShoppingList
 mapItems mapper (ShoppingList internals) =
     ShoppingList { internals | items = mapper internals.items }
+
+
+type ItemPresence
+    = NotPresent
+    | PresentCompleted
+    | PresentPending
+
+
+contains : Item -> ShoppingList -> ItemPresence
+contains item (ShoppingList internals) =
+    case Dict.get item internals.items of
+        Nothing ->
+            NotPresent
+
+        Just Completed ->
+            PresentCompleted
+
+        Just Pending ->
+            PresentPending
 
 
 toggleItem : Item -> ShoppingList -> ShoppingList
