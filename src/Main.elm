@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom
 import Dict exposing (Dict)
 import Html exposing (Html)
-import ItemCreation exposing (searchBarId)
+import ItemCreation exposing (ItemCreationData, searchBarId)
 import ListCreation exposing (listNameInputId)
 import ListSelection
 import Model.ShoppingList exposing (ShoppingList, ShoppingListID, addItem, completedItems, idToString, newShoppingList, pendingItems, shoppingListName, testData, toggleItem)
@@ -34,7 +34,7 @@ type Screen
     = ListSelection
     | ListCreation String
     | ShoppingList ShoppingListID
-    | ItemCreation ShoppingListID Item
+    | ItemCreation ItemCreationData
 
 
 type alias Model =
@@ -92,11 +92,28 @@ mapCurrentShoppingList mapper model =
         ShoppingList list ->
             mapShoppingList list mapper model
 
-        ItemCreation list _ ->
-            mapShoppingList list mapper model
+        ItemCreation { shoppingListId } ->
+            mapShoppingList shoppingListId mapper model
 
         _ ->
             model
+
+
+mapModelWithShoppingList : (ShoppingList -> ( Model, Cmd msg )) -> ShoppingListID -> Model -> ( Model, Cmd msg )
+mapModelWithShoppingList mapModel shoppingListId model =
+    let
+        dictKey =
+            idToString shoppingListId
+
+        maybeShoppingList =
+            Dict.get dictKey model.shoppingLists
+    in
+    case maybeShoppingList of
+        Nothing ->
+            ( model, Cmd.none )
+
+        Just shoppingList ->
+            mapModel shoppingList
 
 
 mapItemIndex : (Index Item -> Index Item) -> Model -> Model
@@ -107,8 +124,11 @@ mapItemIndex mapper model =
 cleanItemSearchInput : Model -> Model
 cleanItemSearchInput model =
     case model.screen of
-        ItemCreation list _ ->
-            { model | screen = ItemCreation list "" }
+        ItemCreation itemCreationData ->
+            { model
+                | screen =
+                    ItemCreation { itemCreationData | itemInput = "" }
+            }
 
         _ ->
             model
@@ -138,13 +158,16 @@ update msg model =
 
         OpenItemCreator ->
             case model.screen of
-                ShoppingList list ->
+                ShoppingList listId ->
                     let
                         focusSearchBar =
                             Browser.Dom.focus searchBarId
                                 |> Task.attempt (\_ -> NoOp)
+
+                        itemCreationData =
+                            ItemCreation.openItemCreator listId
                     in
-                    ( { model | screen = ItemCreation list "" }, focusSearchBar )
+                    ( { model | screen = ItemCreation itemCreationData }, focusSearchBar )
 
                 _ ->
                     ( model, Cmd.none )
@@ -164,8 +187,16 @@ update msg model =
 
         UpdateEditedItem updatedItem ->
             case model.screen of
-                ItemCreation list _ ->
-                    ( { model | screen = ItemCreation list updatedItem }, Cmd.none )
+                ItemCreation screenData ->
+                    let
+                        updateEditedItem : ShoppingList -> ( Model, Cmd Msg )
+                        updateEditedItem shoppingList =
+                            ItemCreation.updateEditedItem model.itemIndex shoppingList updatedItem screenData
+                                |> (\newItemCreationData ->
+                                        ( { model | screen = ItemCreation newItemCreationData }, Cmd.none )
+                                   )
+                    in
+                    mapModelWithShoppingList updateEditedItem screenData.shoppingListId model
 
                 _ ->
                     ( model, Cmd.none )
@@ -220,5 +251,5 @@ view model =
         ShoppingList l ->
             displayShoppingListWith ShoppingListPage.shoppingListPageView l
 
-        ItemCreation l item ->
-            displayShoppingListWith (ItemCreation.itemCreationPageView model.itemIndex item) l
+        ItemCreation data ->
+            displayShoppingListWith (ItemCreation.itemCreationPageView model.itemIndex data) data.shoppingListId

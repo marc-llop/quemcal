@@ -1,4 +1,4 @@
-module ItemCreation exposing (itemCreationPageView, searchBarId)
+module ItemCreation exposing (ItemCreationData, addItem, itemCreationPageView, openItemCreator, searchBarId, updateEditedItem)
 
 import Design exposing (backButton, colors)
 import Element exposing (Element, fill, height, px, shrink, width)
@@ -10,10 +10,54 @@ import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
-import Model.ShoppingList exposing (ShoppingList, ShoppingListID, pendingItems, shoppingListID, shoppingListName)
+import Model.ShoppingList as ShoppingList exposing (ItemPresence(..), ShoppingList, ShoppingListID, pendingItems, shoppingListID)
 import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 import SimpleTextIndex exposing (Index)
+
+
+type alias ItemCreationData =
+    { shoppingListId : ShoppingListID
+    , itemInput : String
+    , editedItem : Item
+    , searchResults : List ( ItemPresence, Item )
+    }
+
+
+openItemCreator : ShoppingListID -> ItemCreationData
+openItemCreator shoppingListId =
+    { shoppingListId = shoppingListId
+    , itemInput = ""
+    , editedItem = ""
+    , searchResults = []
+    }
+
+
+updateEditedItem : Index Item -> ShoppingList -> String -> ItemCreationData -> ItemCreationData
+updateEditedItem itemIndex shoppingList editedItem data =
+    { data
+        | itemInput = editedItem
+        , editedItem = editedItem
+        , searchResults = searchItems itemIndex shoppingList editedItem
+    }
+
+
+addItem : Index Item -> ShoppingList -> ItemCreationData -> ItemCreationData
+addItem itemIndex shoppingList data =
+    { data
+        | itemInput = ""
+        , searchResults = searchItems itemIndex shoppingList data.editedItem
+    }
+
+
+searchItems : Index Item -> ShoppingList -> String -> List ( ItemPresence, Item )
+searchItems itemIndex shoppingList searchQuery =
+    let
+        withPresence item =
+            ( ShoppingList.contains item shoppingList, item )
+    in
+    SimpleTextIndex.search searchQuery itemIndex
+        |> List.map withPresence
 
 
 itemText : String -> Element msg
@@ -126,8 +170,8 @@ itemCreationView items shoppingListID editedItem =
         ]
 
 
-itemCreationPageView : Index Item -> Item -> ShoppingList -> Html Msg
-itemCreationPageView itemIndex editedItem shoppingList =
+itemCreationPageView : Index Item -> ItemCreationData -> ShoppingList -> Html Msg
+itemCreationPageView itemIndex data shoppingList =
     let
         itemIsNotPendingOrIsTheSame : Item -> Bool
         itemIsNotPendingOrIsTheSame item =
@@ -136,23 +180,23 @@ itemCreationPageView itemIndex editedItem shoppingList =
                     List.member item (pendingItems shoppingList)
 
                 isTheSame =
-                    ModelTypes.normalizeItem item == ModelTypes.normalizeItem editedItem
+                    ModelTypes.normalizeItem item == ModelTypes.normalizeItem data.editedItem
             in
             not isPending || isTheSame
 
         items : List Item
         items =
-            SimpleTextIndex.search editedItem itemIndex
+            SimpleTextIndex.search data.editedItem itemIndex
                 |> List.filter itemIsNotPendingOrIsTheSame
 
         itemsWithEdited : List Item
         itemsWithEdited =
-            if editedItem /= "" then
-                editedItem :: items
+            if data.editedItem /= "" then
+                data.editedItem :: items
 
             else
                 []
     in
     Element.layout
         [ Background.color colors.black ]
-        (itemCreationView itemsWithEdited (shoppingListID shoppingList) editedItem)
+        (itemCreationView itemsWithEdited (shoppingListID shoppingList) data.editedItem)
