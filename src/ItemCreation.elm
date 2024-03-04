@@ -271,4 +271,4 @@ itemCreationPageView : ItemCreationData -> Html Msg
 itemCreationPageView data =
     Element.layout
         [ Background.color colors.black ]
-        (itemCreationView data.searchResults data.shoppingListId data.editedItem)
+        (itemCreationView data.searchResults data.shoppingListId data.itemInput)
