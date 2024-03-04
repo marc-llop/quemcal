@@ -99,33 +99,6 @@ mapCurrentShoppingList mapper model =
             model
 
 
-mapModelWithShoppingList : (ShoppingList -> ( Model, Cmd msg )) -> Model -> ( Model, Cmd msg )
-mapModelWithShoppingList mapModel model =
-    let
-        maybeShoppingListId =
-            case model.screen of
-                ItemCreation { shoppingListId } ->
-                    Just shoppingListId
-
-                ShoppingList list ->
-                    Just list
-
-                _ ->
-                    Nothing
-
-        maybeShoppingList =
-            maybeShoppingListId
-                |> Maybe.map idToString
-                |> Maybe.andThen (\dictKey -> Dict.get dictKey model.shoppingLists)
-    in
-    case maybeShoppingList of
-        Nothing ->
-            ( model, Cmd.none )
-
-        Just shoppingList ->
-            mapModel shoppingList
-
-
 mapItemCreationScreen : (ItemCreationData -> Index Item -> ShoppingList -> ( ItemCreationData, Cmd msg )) -> Model -> ( Model, Cmd msg )
 mapItemCreationScreen mapper model =
     case model.screen of
@@ -149,19 +122,6 @@ mapItemCreationScreen mapper model =
 mapItemIndex : (Index Item -> Index Item) -> Model -> Model
 mapItemIndex mapper model =
     { model | itemIndex = mapper model.itemIndex }
-
-
-cleanItemSearchInput : Model -> Model
-cleanItemSearchInput model =
-    case model.screen of
-        ItemCreation itemCreationData ->
-            { model
-                | screen =
-                    ItemCreation { itemCreationData | itemInput = "" }
-            }
-
-        _ ->
-            model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
