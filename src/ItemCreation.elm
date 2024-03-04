@@ -80,59 +80,102 @@ itemText item itemPresence =
         (Element.text item)
 
 
+deleteButton : Item -> Element Msg
+deleteButton item =
+    Input.button
+        [ width (px 64)
+        , height fill
+        , Element.padding 20
+        , Font.color colors.red
+        , Element.focused []
+        ]
+        { onPress = Just NoOp
+        , label = Element.html Icons.trash2
+        }
+
+
 itemRow : Item -> ItemPresence -> Element Msg
 itemRow item itemPresence =
     let
-        ( icon, color ) =
+        icon =
             case itemPresence of
                 NotPresent ->
-                    ( Icons.plus, colors.lightLime )
+                    Icons.plus
 
                 PresentCompleted ->
-                    ( Icons.check, colors.lightLime )
+                    Icons.check
 
                 PresentPending ->
-                    ( Icons.list, colors.lime )
+                    Icons.list
 
-        deleteButton =
-            case itemPresence of
-                PresentPending ->
-                    Input.button
-                        [ width (px 32)
-                        , height fill
-                        , Font.color colors.red
-                        ]
-                        { onPress = Just NoOp
-                        , label = Element.html Icons.trash2
-                        }
+        iconElement =
+            Element.el
+                [ width (px 64)
+                , height fill
+                , Element.padding 20
+                ]
+                (Element.html icon)
 
-                _ ->
-                    Element.none
+        textBox =
+            Element.el
+                [ width fill
+                , Element.paddingEach
+                    { top = 20
+                    , bottom = 20
+                    , left = 0
+                    , right =
+                        if itemPresence == PresentPending then
+                            0
+
+                        else
+                            20
+                    }
+                ]
+                (itemText item itemPresence)
     in
     Element.row
         [ width fill
-        , Element.padding 20
-        , Element.spacing 15
         , Background.color colors.black
-        , Font.color color
         ]
-        [ Element.el
-            [ width (px 32) ]
-            (Element.html icon)
-        , Element.el [ width fill ] <| itemText item itemPresence
-        , deleteButton
+        [ iconElement
+        , textBox
         ]
 
 
 itemView : Item -> ItemPresence -> Element Msg
 itemView item itemPresence =
-    Input.button
+    let
+        hasDeleteButton =
+            itemPresence == PresentPending
+
+        color =
+            if hasDeleteButton then
+                colors.lime
+
+            else
+                colors.lightLime
+
+        deleteButtonIfNeeded =
+            if hasDeleteButton then
+                deleteButton item
+
+            else
+                Element.none
+    in
+    Element.row
         [ width fill
-        , Element.focused []
+        , Background.color colors.black
+        , Font.color color
         ]
-        { onPress = Just <| AddItem item
-        , label = itemRow item itemPresence
-        }
+        [ Input.button
+            [ width fill
+            , Element.focused []
+            ]
+            { onPress = Just <| AddItem item
+            , label = itemRow item itemPresence
+            }
+        , deleteButtonIfNeeded
+        ]
 
 
 searchBarId : String
