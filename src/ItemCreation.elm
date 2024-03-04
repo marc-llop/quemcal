@@ -66,6 +66,7 @@ searchItems itemIndex shoppingList searchQuery =
 
         searchResults =
             SimpleTextIndex.search searchQuery itemIndex
+                |> List.filter (\result -> result /= searchQuery)
                 |> List.map withPresence
     in
     if searchQuery == "" then
