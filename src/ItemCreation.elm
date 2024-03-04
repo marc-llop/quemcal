@@ -1,4 +1,4 @@
-module ItemCreation exposing (ItemCreationData, addItem, itemCreationPageView, openItemCreator, searchBarId, updateEditedItem)
+module ItemCreation exposing (ItemCreationData, addItem, deleteItem, itemCreationPageView, openItemCreator, searchBarId, updateEditedItem)
 
 import Design exposing (backButton, colors)
 import Element exposing (Element, fill, height, px, shrink, width)
@@ -50,6 +50,13 @@ addItem itemIndex shoppingList data =
     }
 
 
+deleteItem : Index Item -> ShoppingList -> ItemCreationData -> ItemCreationData
+deleteItem itemIndex shoppingList data =
+    { data
+        | searchResults = searchItems itemIndex shoppingList data.editedItem
+    }
+
+
 searchItems : Index Item -> ShoppingList -> String -> List ( ItemPresence, Item )
 searchItems itemIndex shoppingList searchQuery =
     let
@@ -89,7 +96,7 @@ deleteButton item =
         , Font.color colors.red
         , Element.focused []
         ]
-        { onPress = Just NoOp
+        { onPress = Just (DeleteItem item)
         , label = Element.html Icons.trash2
         }
 
@@ -161,6 +168,13 @@ itemView item itemPresence =
 
             else
                 Element.none
+
+        addEvent =
+            if hasDeleteButton then
+                Nothing
+
+            else
+                Just (AddItem item)
     in
     Element.row
         [ width fill
@@ -171,7 +185,7 @@ itemView item itemPresence =
             [ width fill
             , Element.focused []
             ]
-            { onPress = Just <| AddItem item
+            { onPress = addEvent
             , label = itemRow item itemPresence
             }
         , deleteButtonIfNeeded

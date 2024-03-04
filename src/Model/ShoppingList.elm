@@ -1,4 +1,4 @@
-module Model.ShoppingList exposing (ItemPresence(..), ItemState(..), ShoppingList, ShoppingListID, addItem, completedItems, contains, idToString, listProgress, newShoppingList, pendingItems, shoppingListID, shoppingListName, testData, toggleItem)
+module Model.ShoppingList exposing (ItemPresence(..), ItemState(..), ShoppingList, ShoppingListID, addItem, completedItems, contains, deleteItem, idToString, listProgress, newShoppingList, pendingItems, shoppingListID, shoppingListName, testData, toggleItem)
 
 import Dict exposing (Dict)
 import Html.Attributes exposing (id)
@@ -162,6 +162,28 @@ addItem item (ShoppingList internals) =
     ShoppingList
         { internals
             | items = Dict.insert item Pending internals.items
+            , completed = newCompleted
+            , total = newTotal
+        }
+
+
+deleteItem : Item -> ShoppingList -> ShoppingList
+deleteItem item (ShoppingList ({ completed, total } as internals)) =
+    let
+        ( newCompleted, newTotal ) =
+            case Dict.get item internals.items of
+                Nothing ->
+                    ( completed, total )
+
+                Just Completed ->
+                    ( completed - 1, total - 1 )
+
+                Just Pending ->
+                    ( completed, total - 1 )
+    in
+    ShoppingList
+        { internals
+            | items = Dict.remove item internals.items
             , completed = newCompleted
             , total = newTotal
         }

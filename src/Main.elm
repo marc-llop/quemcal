@@ -193,6 +193,17 @@ update msg model =
             in
             mapItemCreationScreen addItemInScreenData modelWithUpdatedShoppingLists
 
+        DeleteItem item ->
+            let
+                modelWithUpdatedShoppingLists =
+                    mapCurrentShoppingList (ShoppingList.deleteItem item) model
+
+                deleteItemInScreenData : ItemCreationData -> Index Item -> ShoppingList -> ( ItemCreationData, Cmd Msg )
+                deleteItemInScreenData screenData itemIndex shoppingList =
+                    ( ItemCreation.deleteItem itemIndex shoppingList screenData, Cmd.none )
+            in
+            mapItemCreationScreen deleteItemInScreenData modelWithUpdatedShoppingLists
+
         OpenItemCreator ->
             case model.screen of
                 ShoppingList listId ->
