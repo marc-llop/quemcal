@@ -50,50 +50,77 @@ addItem itemIndex shoppingList data =
     }
 
 
-withPresence : ShoppingList -> Item -> ( ItemPresence, Item )
-withPresence shoppingList item =
-    ( ShoppingList.contains item shoppingList, item )
-
-
 searchItems : Index Item -> ShoppingList -> String -> List ( ItemPresence, Item )
 searchItems itemIndex shoppingList searchQuery =
-    SimpleTextIndex.search searchQuery itemIndex
-        |> List.map (withPresence shoppingList)
+    let
+        withPresence : Item -> ( ItemPresence, Item )
+        withPresence item =
+            ( ShoppingList.contains item shoppingList, item )
+
+        searchResults =
+            SimpleTextIndex.search searchQuery itemIndex
+                |> List.map withPresence
+    in
+    if searchQuery == "" then
+        searchResults
+
+    else
+        withPresence searchQuery :: searchResults
 
 
-itemText : String -> Element msg
-itemText item =
+itemText : String -> ItemPresence -> Element msg
+itemText item itemPresence =
     Element.el
-        [ width fill
-        , Font.color colors.lime
-        ]
+        (if itemPresence == PresentPending then
+            [ Font.alignLeft ]
+
+         else
+            [ Font.alignLeft, Font.glow colors.lime 2.0 ]
+        )
         (Element.text item)
 
 
-itemRow : Item -> ItemPresence -> Element msg
+itemRow : Item -> ItemPresence -> Element Msg
 itemRow item itemPresence =
     let
-        icon =
+        ( icon, color ) =
             case itemPresence of
                 NotPresent ->
-                    Icons.plus
+                    ( Icons.plus, colors.lightLime )
 
                 PresentCompleted ->
-                    Icons.check
+                    ( Icons.check, colors.lightLime )
 
                 PresentPending ->
-                    Icons.list
+                    ( Icons.list, colors.lime )
+
+        deleteButton =
+            case itemPresence of
+                PresentPending ->
+                    Input.button
+                        [ width (px 32)
+                        , height fill
+                        , Font.color colors.red
+                        ]
+                        { onPress = Just NoOp
+                        , label = Element.html Icons.trash2
+                        }
+
+                _ ->
+                    Element.none
     in
     Element.row
         [ width fill
         , Element.padding 20
         , Element.spacing 15
         , Background.color colors.black
+        , Font.color color
         ]
         [ Element.el
             [ width (px 32) ]
             (Element.html icon)
-        , Element.el [] <| itemText item
+        , Element.el [ width fill ] <| itemText item itemPresence
+        , deleteButton
         ]
 
 
