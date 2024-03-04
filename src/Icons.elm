@@ -1,7 +1,9 @@
 module Icons exposing
     ( arrowLeft
+    , check
     , checkSquare
     , edit2
+    , list
     , plus
     , search
     , square
@@ -81,4 +83,23 @@ search =
     svgFeatherIcon "search"
         [ Svg.circle [ cx "11", cy "11", r "8" ] []
         , Svg.line [ x1 "21", y1 "21", x2 "16.65", y2 "16.65" ] []
+        ]
+
+
+check : Html msg
+check =
+    svgFeatherIcon "check"
+        [ Svg.polyline [ points "20 6 9 17 4 12" ] []
+        ]
+
+
+list : Html msg
+list =
+    svgFeatherIcon "list"
+        [ Svg.line [ x1 "8", y1 "6", x2 "21", y2 "6" ] []
+        , Svg.line [ x1 "8", y1 "12", x2 "21", y2 "12" ] []
+        , Svg.line [ x1 "8", y1 "18", x2 "21", y2 "18" ] []
+        , Svg.line [ x1 "3", y1 "6", x2 "3.01", y2 "6" ] []
+        , Svg.line [ x1 "3", y1 "12", x2 "3.01", y2 "12" ] []
+        , Svg.line [ x1 "3", y1 "18", x2 "3.01", y2 "18" ] []
         ]

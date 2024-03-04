@@ -281,4 +281,4 @@ view model =
             displayShoppingListWith ShoppingListPage.shoppingListPageView l
 
         ItemCreation data ->
-            displayShoppingListWith (ItemCreation.itemCreationPageView model.itemIndex data) data.shoppingListId
+            ItemCreation.itemCreationPageView data
