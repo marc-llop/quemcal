@@ -96,6 +96,7 @@ listSelectionView lists =
     Element.column
         [ Background.color colors.black
         , height fill
+        , width fill
         ]
         [ Keyed.column
             [ Element.scrollbarY
