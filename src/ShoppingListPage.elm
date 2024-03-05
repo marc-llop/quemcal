@@ -3,12 +3,14 @@ module ShoppingListPage exposing (shoppingListPageView, shoppingListView)
 import Design exposing (backButton, colors, fabMargin, floatingActionButton)
 import Element exposing (Element, fill, height, px, shrink, spacing, text, width)
 import Element.Background as Background
+import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
+import LongTouch exposing (LongTouchMsg)
 import Model.ModelTypes exposing (Item)
 import Model.ShoppingList exposing (ShoppingList, completedItems, pendingItems, shoppingListName)
 import Msg exposing (Msg(..))
@@ -79,6 +81,8 @@ itemView itemState item =
     Input.button
         [ width fill
         , Element.focused []
+        , Events.onMouseDown (LongTouch <| LongTouch.TouchStart item)
+        , Events.onMouseUp (LongTouch LongTouch.TouchEnd)
         ]
         { onPress =
             case itemState of

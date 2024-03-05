@@ -1,4 +1,4 @@
-module LongTouch exposing (LongTouchModel, LongTouchMsg, initLongTouch, longTouchSubscription, shouldDeleteItem, updateLongTouch)
+module LongTouch exposing (LongTouchModel, LongTouchMsg(..), initLongTouch, longTouchSubscription, shouldDeleteItem, updateLongTouch)
 
 import Time
 
