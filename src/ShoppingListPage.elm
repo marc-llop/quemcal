@@ -79,11 +79,11 @@ itemView itemState item =
                 ]
     in
     Input.button
-        [ width fill
-        , Element.focused []
-        , Events.onMouseDown (LongTouch <| LongTouch.TouchStart item)
-        , Events.onMouseUp (LongTouch LongTouch.TouchEnd)
-        ]
+        ([ width fill
+         , Element.focused []
+         ]
+            ++ LongTouch.onLongTouch LongTouch item
+        )
         { onPress =
             case itemState of
                 Completed ->

@@ -1,21 +1,24 @@
-module LongTouch exposing (LongTouchModel, LongTouchMsg(..), initLongTouch, longTouchSubscription, shouldDeleteItem, updateLongTouch)
+module LongTouch exposing (LongTouchModel, LongTouchMsg(..), initLongTouch, longTouchSubscription, onLongTouch, shouldDeleteItem, updateLongTouch)
 
+import Element exposing (Attribute)
+import Html.Events
+import Json.Decode as Decode
 import Time
 
 
 type LongTouchMsg data
-    = TouchStart data
-    | TouchEnd
+    = TouchStart
+    | TouchEnd data
     | TouchingTick
 
 
-type LongTouchState data
-    = Tachi data
+type LongTouchState
+    = Tachi
     | NoTachi
 
 
-type alias LongTouchModel data =
-    { state : LongTouchState data
+type alias LongTouchModel =
+    { state : LongTouchState
     , duration : Int
     }
 
@@ -34,45 +37,68 @@ minimumLongTouchDuration =
     500
 
 
-initLongTouch : LongTouchModel data
+initLongTouch : LongTouchModel
 initLongTouch =
     { state = NoTachi
     , duration = 0
     }
 
 
-shouldDeleteItem : LongTouchMsg data -> LongTouchModel data -> Maybe data
+shouldDeleteItem : LongTouchMsg data -> LongTouchModel -> Maybe data
 shouldDeleteItem msg model =
-    case model.state of
-        Tachi data ->
-            if msg == TouchEnd && model.duration > minimumLongTouchDuration then
+    case ( model.state, msg ) of
+        ( Tachi, TouchEnd data ) ->
+            if model.duration > minimumLongTouchDuration then
                 Just data
 
             else
                 Nothing
 
-        NoTachi ->
+        ( _, _ ) ->
             Nothing
 
 
-longTouchSubscription : LongTouchModel data -> Sub (LongTouchMsg data)
+longTouchSubscription : LongTouchModel -> Sub (LongTouchMsg data)
 longTouchSubscription { state } =
     case state of
-        Tachi _ ->
+        Tachi ->
             Time.every 100 (\_ -> TouchingTick)
 
         NoTachi ->
             Sub.none
 
 
-updateLongTouch : LongTouchMsg data -> LongTouchModel data -> LongTouchModel data
+updateLongTouch : LongTouchMsg data -> LongTouchModel -> LongTouchModel
 updateLongTouch msg model =
     case msg of
-        TouchStart item ->
-            { state = Tachi item, duration = 0 }
+        TouchStart ->
+            { state = Tachi, duration = 0 }
 
-        TouchEnd ->
+        TouchEnd _ ->
             { model | state = NoTachi }
 
         TouchingTick ->
             { model | duration = model.duration + refreshFrequency }
+
+
+onTouchStart : (LongTouchMsg data -> msg) -> Attribute msg
+onTouchStart msgWrapper =
+    Html.Events.on "touchstart" (Decode.succeed <| msgWrapper TouchStart)
+        |> Element.htmlAttribute
+
+
+onTouchEnd : (LongTouchMsg data -> msg) -> data -> Attribute msg
+onTouchEnd msgWrapper data =
+    let
+        msg =
+            msgWrapper (TouchEnd data)
+    in
+    Html.Events.on "touchend" (Decode.succeed msg)
+        |> Element.htmlAttribute
+
+
+onLongTouch : (LongTouchMsg data -> msg) -> data -> List (Attribute msg)
+onLongTouch msgWrapper data =
+    [ onTouchStart msgWrapper
+    , onTouchEnd msgWrapper data
+    ]
