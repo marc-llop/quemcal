@@ -215,7 +215,7 @@ update msg model =
                     LongTouch.shouldDeleteItem longTouchMsg model.longTouch
 
                 maybeItem =
-                    LongTouch.touchEndInfo longTouchMsg
+                    LongTouch.touchEndInfo longTouchMsg model.longTouch
 
                 mapLongTouch : (LongTouchModel -> LongTouchModel) -> Model -> Model
                 mapLongTouch mapper a =

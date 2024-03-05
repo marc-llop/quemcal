@@ -8,6 +8,7 @@ import Time
 
 type LongTouchMsg data
     = TouchStart
+    | TouchMove
     | TouchEnd data
     | TouchingTick
 
@@ -58,10 +59,10 @@ shouldDeleteItem msg model =
             False
 
 
-touchEndInfo : LongTouchMsg data -> Maybe data
-touchEndInfo msg =
-    case msg of
-        TouchEnd data ->
+touchEndInfo : LongTouchMsg data -> LongTouchModel -> Maybe data
+touchEndInfo msg model =
+    case ( model.state, msg ) of
+        ( Tachi, TouchEnd data ) ->
             Just data
 
         _ ->
@@ -87,13 +88,29 @@ updateLongTouch msg model =
         TouchEnd _ ->
             { model | state = NoTachi }
 
+        TouchMove ->
+            { state = NoTachi, duration = 0 }
+
         TouchingTick ->
-            { model | duration = model.duration + refreshFrequency }
+            { model
+                | duration =
+                    if model.state == Tachi then
+                        model.duration + refreshFrequency
+
+                    else
+                        0
+            }
 
 
 onTouchStart : (LongTouchMsg data -> msg) -> Attribute msg
 onTouchStart msgWrapper =
     Html.Events.on "touchstart" (Decode.succeed <| msgWrapper TouchStart)
+        |> Element.htmlAttribute
+
+
+onTouchMove : (LongTouchMsg data -> msg) -> Attribute msg
+onTouchMove msgWrapper =
+    Html.Events.on "touchmove" (Decode.succeed <| msgWrapper TouchMove)
         |> Element.htmlAttribute
 
 
@@ -110,5 +127,6 @@ onTouchEnd msgWrapper data =
 onLongTouch : (LongTouchMsg data -> msg) -> data -> List (Attribute msg)
 onLongTouch msgWrapper data =
     [ onTouchStart msgWrapper
+    , onTouchMove msgWrapper
     , onTouchEnd msgWrapper data
     ]
