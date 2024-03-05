@@ -1,4 +1,4 @@
-module LongTouch exposing (LongTouchModel, LongTouchMsg(..), initLongTouch, longTouchSubscription, onLongTouch, shouldDeleteItem, updateLongTouch)
+module LongTouch exposing (LongTouchModel, LongTouchMsg(..), initLongTouch, longTouchSubscription, onLongTouch, shouldDeleteItem, touchEndInfo, updateLongTouch)
 
 import Element exposing (Attribute)
 import Html.Events
@@ -44,17 +44,27 @@ initLongTouch =
     }
 
 
-shouldDeleteItem : LongTouchMsg data -> LongTouchModel -> Maybe data
+shouldDeleteItem : LongTouchMsg data -> LongTouchModel -> Bool
 shouldDeleteItem msg model =
     case ( model.state, msg ) of
-        ( Tachi, TouchEnd data ) ->
+        ( Tachi, TouchEnd _ ) ->
             if model.duration > minimumLongTouchDuration then
-                Just data
+                True
 
             else
-                Nothing
+                False
 
         ( _, _ ) ->
+            False
+
+
+touchEndInfo : LongTouchMsg data -> Maybe data
+touchEndInfo msg =
+    case msg of
+        TouchEnd data ->
+            Just data
+
+        _ ->
             Nothing
 
 

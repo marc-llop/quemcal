@@ -9,7 +9,6 @@ type Msg
     = NoOp
     | SelectList ShoppingListID
     | BackToListSelection
-    | CompleteItem Item
     | AddItem String
     | DeleteItem Item
     | OpenItemCreator

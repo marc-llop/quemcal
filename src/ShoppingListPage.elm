@@ -79,13 +79,7 @@ itemView itemState item =
          ]
             ++ LongTouch.onLongTouch LongTouch item
         )
-        { onPress =
-            case itemState of
-                Completed ->
-                    Just (AddItem item)
-
-                Pending ->
-                    Just (CompleteItem item)
+        { onPress = Nothing
         , label = itemRow
         }
 

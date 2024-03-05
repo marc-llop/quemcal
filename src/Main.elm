@@ -8,7 +8,7 @@ import ItemCreation exposing (ItemCreationData, searchBarId)
 import ListCreation exposing (listNameInputId)
 import ListSelection
 import LongTouch exposing (LongTouchModel, LongTouchMsg)
-import Model.ModelTypes exposing (Item)
+import Model.ModelTypes exposing (Item, ItemState(..))
 import Model.ShoppingList as ShoppingList exposing (ShoppingList, ShoppingListID, completedItems, idToString, newShoppingList, pendingItems, shoppingListName, testData, toggleItem)
 import Msg exposing (Msg(..))
 import Platform.Cmd as Cmd
@@ -139,9 +139,6 @@ update msg model =
         BackToListSelection ->
             ( { model | screen = ListSelection }, Cmd.none )
 
-        CompleteItem item ->
-            ( mapCurrentShoppingList (toggleItem item) model, Cmd.none )
-
         AddItem item ->
             model
                 |> mapItemIndex (SimpleTextIndex.add item)
@@ -214,21 +211,46 @@ update msg model =
 
         LongTouch longTouchMsg ->
             let
-                maybeItemToDelete =
+                shouldDeleteItem =
                     LongTouch.shouldDeleteItem longTouchMsg model.longTouch
 
-                deleteTouchedFromShoppingList shoppingList =
-                    maybeItemToDelete
-                        |> Maybe.map (\item -> ShoppingList.deleteItem item shoppingList)
-                        |> Maybe.withDefault shoppingList
+                maybeItem =
+                    LongTouch.touchEndInfo longTouchMsg
 
                 mapLongTouch : (LongTouchModel -> LongTouchModel) -> Model -> Model
-                mapLongTouch mapper wholeModel =
-                    { model | longTouch = mapper wholeModel.longTouch }
+                mapLongTouch mapper a =
+                    { a | longTouch = mapper a.longTouch }
+
+                modelWithToggledItem item =
+                    model
+                        |> mapCurrentShoppingList (ShoppingList.toggleItem item)
+
+                modelWithDeletedItem item =
+                    model
+                        |> mapCurrentShoppingList (ShoppingList.deleteItem item)
+
+                log str modelToLog =
+                    let
+                        _ =
+                            Debug.log str modelToLog.shoppingLists
+                    in
+                    modelToLog
+
+                modelWithUpdatedItem =
+                    case ( maybeItem, shouldDeleteItem ) of
+                        ( Nothing, _ ) ->
+                            model
+
+                        ( Just item, False ) ->
+                            modelWithToggledItem item
+
+                        ( Just item, True ) ->
+                            modelWithDeletedItem item
             in
-            model
-                |> mapCurrentShoppingList deleteTouchedFromShoppingList
+            modelWithUpdatedItem
+                |> log "modelWithToggledItem"
                 |> mapLongTouch (LongTouch.updateLongTouch longTouchMsg)
+                |> log "updatedLongTouch"
                 |> (\newModel -> ( newModel, Cmd.none ))
 
 
