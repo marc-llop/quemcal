@@ -33,8 +33,8 @@ openItemCreator shoppingListId =
     }
 
 
-updateEditedItem : Index Item -> ShoppingList -> String -> ItemCreationData -> ItemCreationData
-updateEditedItem itemIndex shoppingList editedItem data =
+updateEditedItem : String -> Index Item -> ShoppingList -> ItemCreationData -> ItemCreationData
+updateEditedItem editedItem itemIndex shoppingList data =
     { data
         | itemInput = editedItem
         , editedItem = editedItem

@@ -99,7 +99,7 @@ mapCurrentShoppingList mapper model =
             model
 
 
-mapItemCreationScreen : (ItemCreationData -> Index Item -> ShoppingList -> ( ItemCreationData, Cmd msg )) -> Model -> ( Model, Cmd msg )
+mapItemCreationScreen : (Index Item -> ShoppingList -> ItemCreationData -> ItemCreationData) -> Model -> ( Model, Cmd msg )
 mapItemCreationScreen mapper model =
     case model.screen of
         ItemCreation screenData ->
@@ -111,8 +111,8 @@ mapItemCreationScreen mapper model =
                     Dict.get dictKey model.shoppingLists
             in
             maybeShoppingList
-                |> Maybe.map (mapper screenData model.itemIndex)
-                |> Maybe.map (\( newScreenData, cmd ) -> ( { model | screen = ItemCreation newScreenData }, cmd ))
+                |> Maybe.map (\shoppingList -> mapper model.itemIndex shoppingList screenData)
+                |> Maybe.map (\newScreenData -> ( { model | screen = ItemCreation newScreenData }, Cmd.none ))
                 |> Maybe.withDefault ( model, Cmd.none )
 
         _ ->
@@ -140,29 +140,15 @@ update msg model =
             ( mapCurrentShoppingList (toggleItem item) model, Cmd.none )
 
         AddItem item ->
-            let
-                modelWithUpdatedItemIndex =
-                    mapItemIndex (SimpleTextIndex.add item) model
-
-                modelWithUpdatedShoppingLists =
-                    mapCurrentShoppingList (ShoppingList.addItem item) modelWithUpdatedItemIndex
-
-                addItemInScreenData : ItemCreationData -> Index Item -> ShoppingList -> ( ItemCreationData, Cmd Msg )
-                addItemInScreenData screenData itemIndex shoppingList =
-                    ( ItemCreation.addItem itemIndex shoppingList screenData, Cmd.none )
-            in
-            mapItemCreationScreen addItemInScreenData modelWithUpdatedShoppingLists
+            model
+                |> mapItemIndex (SimpleTextIndex.add item)
+                |> mapCurrentShoppingList (ShoppingList.addItem item)
+                |> mapItemCreationScreen ItemCreation.addItem
 
         DeleteItem item ->
-            let
-                modelWithUpdatedShoppingLists =
-                    mapCurrentShoppingList (ShoppingList.deleteItem item) model
-
-                deleteItemInScreenData : ItemCreationData -> Index Item -> ShoppingList -> ( ItemCreationData, Cmd Msg )
-                deleteItemInScreenData screenData itemIndex shoppingList =
-                    ( ItemCreation.deleteItem itemIndex shoppingList screenData, Cmd.none )
-            in
-            mapItemCreationScreen deleteItemInScreenData modelWithUpdatedShoppingLists
+            model
+                |> mapCurrentShoppingList (ShoppingList.deleteItem item)
+                |> mapItemCreationScreen ItemCreation.deleteItem
 
         OpenItemCreator ->
             case model.screen of
@@ -194,12 +180,7 @@ update msg model =
                     ( model, Cmd.none )
 
         UpdateEditedItem updatedItem ->
-            let
-                updateEditedItem : ItemCreationData -> Index Item -> ShoppingList -> ( ItemCreationData, Cmd Msg )
-                updateEditedItem screenData itemIndex shoppingList =
-                    ( ItemCreation.updateEditedItem itemIndex shoppingList updatedItem screenData, Cmd.none )
-            in
-            mapItemCreationScreen updateEditedItem model
+            mapItemCreationScreen (ItemCreation.updateEditedItem updatedItem) model
 
         UpdateEditedList updatedList ->
             case model.screen of
