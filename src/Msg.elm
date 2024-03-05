@@ -1,8 +1,8 @@
 module Msg exposing (Msg(..))
 
 import LongTouch exposing (LongTouchMsg)
+import Model.ModelTypes exposing (Item)
 import Model.ShoppingList exposing (ShoppingListID)
-import ModelTypes exposing (Item)
 
 
 type Msg

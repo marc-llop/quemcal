@@ -1,4 +1,4 @@
-module ModelTypes exposing (Item, normalizeItem)
+module Model.ModelTypes exposing (Item, normalizeItem)
 
 import String.Normalize
 

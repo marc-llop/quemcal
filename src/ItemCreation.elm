@@ -10,8 +10,8 @@ import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
+import Model.ModelTypes exposing (Item)
 import Model.ShoppingList as ShoppingList exposing (ItemPresence(..), ShoppingList, ShoppingListID, pendingItems, shoppingListID)
-import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 import SimpleTextIndex exposing (Index)
 

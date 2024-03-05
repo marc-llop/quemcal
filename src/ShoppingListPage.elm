@@ -9,8 +9,8 @@ import Element.Keyed as Keyed
 import Html exposing (Html)
 import Html.Attributes
 import Icons
+import Model.ModelTypes exposing (Item)
 import Model.ShoppingList exposing (ShoppingList, completedItems, pendingItems, shoppingListName)
-import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 
 

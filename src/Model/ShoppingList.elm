@@ -2,7 +2,7 @@ module Model.ShoppingList exposing (ItemPresence(..), ItemState(..), ShoppingLis
 
 import Dict exposing (Dict)
 import Html.Attributes exposing (id)
-import ModelTypes exposing (Item)
+import Model.ModelTypes exposing (Item)
 
 
 type ShoppingList

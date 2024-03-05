@@ -8,8 +8,8 @@ import ItemCreation exposing (ItemCreationData, searchBarId)
 import ListCreation exposing (listNameInputId)
 import ListSelection
 import LongTouch exposing (LongTouchModel, LongTouchMsg)
+import Model.ModelTypes exposing (Item)
 import Model.ShoppingList as ShoppingList exposing (ShoppingList, ShoppingListID, completedItems, idToString, newShoppingList, pendingItems, shoppingListName, testData, toggleItem)
-import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
 import Platform.Cmd as Cmd
 import ShoppingListPage
@@ -72,7 +72,7 @@ init _ =
             SimpleTextIndex.config
                 { ref = itemToString
                 , fields = [ itemToString ]
-                , normalize = ModelTypes.normalizeItem
+                , normalize = Model.ModelTypes.normalizeItem
                 }
                 |> SimpleTextIndex.new
                 |> populateIndex testData
