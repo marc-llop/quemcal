@@ -229,13 +229,6 @@ update msg model =
                     model
                         |> mapCurrentShoppingList (ShoppingList.deleteItem item)
 
-                log str modelToLog =
-                    let
-                        _ =
-                            Debug.log str modelToLog.shoppingLists
-                    in
-                    modelToLog
-
                 modelWithUpdatedItem =
                     case ( maybeItem, shouldDeleteItem ) of
                         ( Nothing, _ ) ->
@@ -248,9 +241,7 @@ update msg model =
                             modelWithDeletedItem item
             in
             modelWithUpdatedItem
-                |> log "modelWithToggledItem"
                 |> mapLongTouch (LongTouch.updateLongTouch longTouchMsg)
-                |> log "updatedLongTouch"
                 |> (\newModel -> ( newModel, Cmd.none ))
 
 
