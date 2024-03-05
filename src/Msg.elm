@@ -1,5 +1,6 @@
 module Msg exposing (Msg(..))
 
+import LongTouch exposing (LongTouchMsg)
 import Model.ShoppingList exposing (ShoppingListID)
 import ModelTypes exposing (Item)
 
@@ -16,3 +17,4 @@ type Msg
     | UpdateEditedItem String
     | UpdateEditedList String
     | AddList String
+    | LongTouch LongTouchMsg

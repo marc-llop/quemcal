@@ -7,6 +7,7 @@ import Html exposing (Html)
 import ItemCreation exposing (ItemCreationData, searchBarId)
 import ListCreation exposing (listNameInputId)
 import ListSelection
+import LongTouch exposing (LongTouchModel, LongTouchMsg)
 import Model.ShoppingList as ShoppingList exposing (ShoppingList, ShoppingListID, completedItems, idToString, newShoppingList, pendingItems, shoppingListName, testData, toggleItem)
 import ModelTypes exposing (Item)
 import Msg exposing (Msg(..))
@@ -22,7 +23,7 @@ main =
         { init = init
         , update = update
         , view = view
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }
 
 
@@ -41,6 +42,7 @@ type alias Model =
     { screen : Screen
     , shoppingLists : Dict String ShoppingList
     , itemIndex : Index Item
+    , longTouch : LongTouchModel
     }
 
 
@@ -74,6 +76,7 @@ init _ =
                 }
                 |> SimpleTextIndex.new
                 |> populateIndex testData
+      , longTouch = LongTouch.initLongTouch
       }
     , Cmd.none
     )
@@ -208,6 +211,30 @@ update msg model =
 
                 _ ->
                     ( model, Cmd.none )
+
+        LongTouch longTouchMsg ->
+            let
+                maybeItemToDelete =
+                    LongTouch.shouldDeleteItem longTouchMsg model.longTouch
+
+                deleteTouchedFromShoppingList shoppingList =
+                    maybeItemToDelete
+                        |> Maybe.map (\item -> ShoppingList.deleteItem item shoppingList)
+                        |> Maybe.withDefault shoppingList
+
+                mapLongTouch : (LongTouchModel -> LongTouchModel) -> Model -> Model
+                mapLongTouch mapper wholeModel =
+                    { model | longTouch = mapper wholeModel.longTouch }
+            in
+            model
+                |> mapCurrentShoppingList deleteTouchedFromShoppingList
+                |> mapLongTouch (LongTouch.updateLongTouch longTouchMsg)
+                |> (\newModel -> ( newModel, Cmd.none ))
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.map LongTouch (LongTouch.longTouchSubscription model.longTouch)
 
 
 view : Model -> Html Msg
