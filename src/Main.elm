@@ -42,7 +42,7 @@ type alias Model =
     { screen : Screen
     , shoppingLists : Dict String ShoppingList
     , itemIndex : Index Item
-    , longTouch : LongTouchModel
+    , longTouch : LongTouchModel Item
     }
 
 
@@ -222,7 +222,7 @@ update msg model =
                         |> Maybe.map (\item -> ShoppingList.deleteItem item shoppingList)
                         |> Maybe.withDefault shoppingList
 
-                mapLongTouch : (LongTouchModel -> LongTouchModel) -> Model -> Model
+                mapLongTouch : (LongTouchModel Item -> LongTouchModel Item) -> Model -> Model
                 mapLongTouch mapper wholeModel =
                     { model | longTouch = mapper wholeModel.longTouch }
             in

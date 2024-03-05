@@ -17,4 +17,4 @@ type Msg
     | UpdateEditedItem String
     | UpdateEditedList String
     | AddList String
-    | LongTouch LongTouchMsg
+    | LongTouch (LongTouchMsg Item)

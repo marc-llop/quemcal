@@ -1,22 +1,21 @@
 module LongTouch exposing (LongTouchModel, LongTouchMsg, initLongTouch, longTouchSubscription, shouldDeleteItem, updateLongTouch)
 
-import ModelTypes exposing (Item)
 import Time
 
 
-type LongTouchMsg
-    = TouchStart Item
+type LongTouchMsg data
+    = TouchStart data
     | TouchEnd
     | TouchingTick
 
 
-type LongTouchState
-    = Tachi Item
+type LongTouchState data
+    = Tachi data
     | NoTachi
 
 
-type alias LongTouchModel =
-    { state : LongTouchState
+type alias LongTouchModel data =
+    { state : LongTouchState data
     , duration : Int
     }
 
@@ -35,19 +34,19 @@ minimumLongTouchDuration =
     500
 
 
-initLongTouch : LongTouchModel
+initLongTouch : LongTouchModel data
 initLongTouch =
     { state = NoTachi
     , duration = 0
     }
 
 
-shouldDeleteItem : LongTouchMsg -> LongTouchModel -> Maybe Item
+shouldDeleteItem : LongTouchMsg data -> LongTouchModel data -> Maybe data
 shouldDeleteItem msg model =
     case model.state of
-        Tachi item ->
+        Tachi data ->
             if msg == TouchEnd && model.duration > minimumLongTouchDuration then
-                Just item
+                Just data
 
             else
                 Nothing
@@ -56,7 +55,7 @@ shouldDeleteItem msg model =
             Nothing
 
 
-longTouchSubscription : LongTouchModel -> Sub LongTouchMsg
+longTouchSubscription : LongTouchModel data -> Sub (LongTouchMsg data)
 longTouchSubscription { state } =
     case state of
         Tachi _ ->
@@ -66,7 +65,7 @@ longTouchSubscription { state } =
             Sub.none
 
 
-updateLongTouch : LongTouchMsg -> LongTouchModel -> LongTouchModel
+updateLongTouch : LongTouchMsg data -> LongTouchModel data -> LongTouchModel data
 updateLongTouch msg model =
     case msg of
         TouchStart item ->
