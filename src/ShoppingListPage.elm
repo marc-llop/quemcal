@@ -11,14 +11,9 @@ import Html exposing (Html)
 import Html.Attributes
 import Icons
 import LongTouch exposing (LongTouchMsg)
-import Model.ModelTypes exposing (Item)
+import Model.ModelTypes exposing (Item, ItemState(..))
 import Model.ShoppingList exposing (ShoppingList, completedItems, pendingItems, shoppingListName)
 import Msg exposing (Msg(..))
-
-
-type ItemState
-    = Completed
-    | Pending
 
 
 itemText : ItemState -> Item -> Element msg

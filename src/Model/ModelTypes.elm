@@ -1,4 +1,4 @@
-module Model.ModelTypes exposing (Item, normalizeItem)
+module Model.ModelTypes exposing (Item, ItemState(..), normalizeItem)
 
 import String.Normalize
 
@@ -10,3 +10,8 @@ type alias Item =
 normalizeItem : Item -> String
 normalizeItem =
     String.toLower >> String.Normalize.removeDiacritics
+
+
+type ItemState
+    = Completed
+    | Pending
