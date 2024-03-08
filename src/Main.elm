@@ -1,41 +1,49 @@
 module Main exposing (main)
 
-import Browser
+import Browser exposing (UrlRequest(..))
 import Browser.Dom
+import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Html exposing (Html)
 import ItemCreation exposing (ItemCreationData, searchBarId)
 import ListCreation exposing (listNameInputId)
 import ListSelection
-import LongTouch exposing (LongTouchModel, LongTouchMsg)
+import LongTouch exposing (LongTouchModel)
 import Model.ModelTypes exposing (Item, ItemState(..))
+import Model.Screen as Screen exposing (Screen(..))
 import Model.ShoppingList as ShoppingList exposing (ShoppingList, ShoppingListID, completedItems, idToString, newShoppingList, pendingItems, shoppingListName, testData, toggleItem)
 import Msg exposing (Msg(..))
 import Platform.Cmd as Cmd
 import ShoppingListPage
 import SimpleTextIndex exposing (Index)
 import Task
+import Url exposing (Url)
 
 
 main : Program () Model Msg
 main =
-    Browser.element
+    Browser.application
         { init = init
         , update = update
         , view = view
         , subscriptions = subscriptions
+        , onUrlChange = Navigate
+        , onUrlRequest = onUrlRequest
         }
+
+
+onUrlRequest : UrlRequest -> Msg
+onUrlRequest urlRequest =
+    case urlRequest of
+        Internal url ->
+            Navigate url
+
+        External _ ->
+            NoOp
 
 
 type alias Flags =
     ()
-
-
-type Screen
-    = ListSelection
-    | ListCreation String
-    | ShoppingList ShoppingListID
-    | ItemCreation ItemCreationData
 
 
 type alias Model =
@@ -43,6 +51,7 @@ type alias Model =
     , shoppingLists : Dict String ShoppingList
     , itemIndex : Index Item
     , longTouch : LongTouchModel
+    , key : Key
     }
 
 
@@ -64,10 +73,14 @@ itemToString a =
     a
 
 
-init : Flags -> ( Model, Cmd Msg )
-init _ =
-    ( { screen = ListSelection
-      , shoppingLists = testData
+init : Flags -> Url -> Key -> ( Model, Cmd Msg )
+init _ url key =
+    let
+        shoppingLists =
+            testData
+    in
+    ( { screen = Screen.urlToScreen shoppingLists url
+      , shoppingLists = shoppingLists
       , itemIndex =
             SimpleTextIndex.config
                 { ref = itemToString
@@ -77,6 +90,7 @@ init _ =
                 |> SimpleTextIndex.new
                 |> populateIndex testData
       , longTouch = LongTouch.initLongTouch
+      , key = key
       }
     , Cmd.none
     )
@@ -133,11 +147,12 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        SelectList l ->
-            ( { model | screen = ShoppingList l }, Cmd.none )
-
-        BackToListSelection ->
-            ( { model | screen = ListSelection }, Cmd.none )
+        Navigate url ->
+            let
+                newScreen =
+                    Screen.urlToScreen model.shoppingLists url
+            in
+            ( { model | screen = newScreen }, Screen.onLoadCommand newScreen )
 
         AddItem item ->
             model
@@ -150,41 +165,12 @@ update msg model =
                 |> mapCurrentShoppingList (ShoppingList.deleteItem item)
                 |> mapItemCreationScreen ItemCreation.deleteItem
 
-        OpenItemCreator ->
-            case model.screen of
-                ShoppingList listId ->
-                    let
-                        focusSearchBar =
-                            Browser.Dom.focus searchBarId
-                                |> Task.attempt (\_ -> NoOp)
-
-                        itemCreationData =
-                            ItemCreation.openItemCreator listId
-                    in
-                    ( { model | screen = ItemCreation itemCreationData }, focusSearchBar )
-
-                _ ->
-                    ( model, Cmd.none )
-
-        OpenListCreator ->
-            case model.screen of
-                ListSelection ->
-                    let
-                        focusListNameInput =
-                            Browser.Dom.focus listNameInputId
-                                |> Task.attempt (\_ -> NoOp)
-                    in
-                    ( { model | screen = ListCreation "" }, focusListNameInput )
-
-                _ ->
-                    ( model, Cmd.none )
-
         UpdateEditedItem updatedItem ->
             mapItemCreationScreen (ItemCreation.updateEditedItem updatedItem) model
 
         UpdateEditedList updatedList ->
             case model.screen of
-                ListCreation listName ->
+                ListCreation _ ->
                     ( { model | screen = ListCreation updatedList }
                     , Cmd.none
                     )
@@ -250,8 +236,15 @@ subscriptions model =
     Sub.map LongTouch (LongTouch.longTouchSubscription model.longTouch)
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
+    { title = "Quèmcal"
+    , body = [ viewHtml model ]
+    }
+
+
+viewHtml : Model -> Html Msg
+viewHtml model =
     let
         allShoppingLists =
             Dict.values model.shoppingLists
