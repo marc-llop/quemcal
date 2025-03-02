@@ -3,7 +3,6 @@ module Main exposing (main)
 import Browser exposing (UrlRequest(..))
 import Browser.Dom
 import Browser.Navigation exposing (Key, pushUrl)
-import Debug
 import Dict exposing (Dict)
 import Html exposing (Html)
 import ItemCreation exposing (searchBarId)
@@ -184,7 +183,7 @@ update msg model =
         Navigate urlString ->
             let
                 route =
-                    Debug.log "Navigate" (Router.stringToRoute (Debug.log "urlString" urlString))
+                    Router.stringToRoute urlString
 
                 newScreen =
                     Router.routeToScreen model.shoppingLists route
