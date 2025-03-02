@@ -87,7 +87,7 @@ urlToScreen shoppingLists =
 stringToRoute : String -> Route
 stringToRoute urlString =
     Url.fromString urlString
-        |> Maybe.map (\url -> urlToRoute <| Debug.log "stringToRoute" url)
+        |> Maybe.map (\url -> urlToRoute url)
         |> Maybe.withDefault ListSelection
 
 
