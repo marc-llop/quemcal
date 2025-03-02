@@ -2,18 +2,20 @@ module Main exposing (main)
 
 import Browser exposing (UrlRequest(..))
 import Browser.Dom
-import Browser.Navigation exposing (Key)
+import Browser.Navigation exposing (Key, pushUrl)
+import Debug
 import Dict exposing (Dict)
 import Html exposing (Html)
-import ItemCreation exposing (ItemCreationData, searchBarId)
+import ItemCreation exposing (searchBarId)
 import ListCreation exposing (listNameInputId)
 import ListSelection
 import LongTouch exposing (LongTouchModel)
 import Model.ModelTypes exposing (Item, ItemState(..))
-import Model.Screen as Screen exposing (Screen(..))
+import Model.Screen as Screen exposing (ItemCreationData, Screen(..))
 import Model.ShoppingList as ShoppingList exposing (ShoppingList, ShoppingListID, completedItems, idToString, newShoppingList, pendingItems, shoppingListName, testData, toggleItem)
 import Msg exposing (Msg(..))
 import Platform.Cmd as Cmd
+import Router
 import ShoppingListPage
 import SimpleTextIndex exposing (Index)
 import Task
@@ -27,7 +29,7 @@ main =
         , update = update
         , view = view
         , subscriptions = subscriptions
-        , onUrlChange = Navigate
+        , onUrlChange = LoadScreen
         , onUrlRequest = onUrlRequest
         }
 
@@ -36,7 +38,7 @@ onUrlRequest : UrlRequest -> Msg
 onUrlRequest urlRequest =
     case urlRequest of
         Internal url ->
-            Navigate url
+            LoadScreen url
 
         External _ ->
             NoOp
@@ -79,7 +81,7 @@ init _ url key =
         shoppingLists =
             testData
     in
-    ( { screen = Screen.urlToScreen shoppingLists url
+    ( { screen = Router.urlToScreen shoppingLists url
       , shoppingLists = shoppingLists
       , itemIndex =
             SimpleTextIndex.config
@@ -141,18 +143,59 @@ mapItemIndex mapper model =
     { model | itemIndex = mapper model.itemIndex }
 
 
+focusOnLoad : String -> Cmd Msg
+focusOnLoad elementId =
+    Browser.Dom.focus elementId
+        |> Task.attempt (\_ -> NoOp)
+
+
+onLoadCommand : Screen -> Cmd Msg
+onLoadCommand screen =
+    case screen of
+        ListCreation _ ->
+            focusOnLoad ListCreation.listNameInputId
+
+        ItemCreation _ ->
+            focusOnLoad ItemCreation.searchBarId
+
+        _ ->
+            Cmd.none
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
 
-        Navigate url ->
+        LoadScreen url ->
             let
+                route =
+                    Router.urlToRoute url
+
                 newScreen =
-                    Screen.urlToScreen model.shoppingLists url
+                    Router.routeToScreen model.shoppingLists route
+
+                onLoadCmd =
+                    onLoadCommand newScreen
             in
-            ( { model | screen = newScreen }, Screen.onLoadCommand newScreen )
+            ( { model | screen = newScreen }, onLoadCmd )
+
+        Navigate urlString ->
+            let
+                route =
+                    Debug.log "Navigate" (Router.stringToRoute (Debug.log "urlString" urlString))
+
+                newScreen =
+                    Router.routeToScreen model.shoppingLists route
+
+                onLoadCmd =
+                    onLoadCommand newScreen
+
+                changeLocationCmd =
+                    pushUrl model.key urlString
+            in
+            ( { model | screen = newScreen }, Cmd.batch [ onLoadCmd, changeLocationCmd ] )
 
         AddItem item ->
             model
@@ -189,7 +232,7 @@ update msg model =
                         | screen = ShoppingList shoppingListName
                         , shoppingLists = Dict.insert listName shoppingList model.shoppingLists
                       }
-                    , Cmd.none
+                    , pushUrl model.key (Router.shoppingListUrl shoppingListName)
                     )
 
                 _ ->

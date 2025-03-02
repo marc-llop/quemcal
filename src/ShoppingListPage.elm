@@ -12,8 +12,9 @@ import Html.Attributes
 import Icons
 import LongTouch exposing (LongTouchMsg)
 import Model.ModelTypes exposing (Item, ItemState(..))
-import Model.ShoppingList exposing (ShoppingList, completedItems, pendingItems, shoppingListName)
+import Model.ShoppingList exposing (ShoppingList, completedItems, pendingItems, shoppingListID, shoppingListName)
 import Msg exposing (Msg(..))
+import Router
 
 
 itemText : ItemState -> Item -> Element msg
@@ -110,7 +111,7 @@ listHeaderView listName =
         , Font.bold
         , Font.alignLeft
         ]
-        [ backButton BackToListSelection
+        [ backButton Router.goToListSelection
         , Element.el [ width (px 5) ] Element.none
         , textWithEllipsis listName
         , Element.el [ width (px 20) ] Element.none
@@ -159,8 +160,12 @@ shoppingListView shoppingList =
 
 shoppingListPageView : ShoppingList -> Html Msg
 shoppingListPageView shoppingList =
+    let
+        listId =
+            shoppingListID shoppingList
+    in
     Element.layout
         [ Background.color colors.black
-        , floatingActionButton OpenItemCreator
+        , floatingActionButton (Router.goToItemCreation listId)
         ]
         (shoppingListView shoppingList)

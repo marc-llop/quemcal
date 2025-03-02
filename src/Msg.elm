@@ -7,7 +7,8 @@ import Url exposing (Url)
 
 type Msg
     = NoOp
-    | Navigate Url
+    | LoadScreen Url
+    | Navigate String
       -- | SelectList ShoppingListID
       -- | BackToListSelection
     | AddItem String

@@ -1,4 +1,4 @@
-module ItemCreation exposing (ItemCreationData, addItem, deleteItem, itemCreationPageView, openItemCreator, searchBarId, updateEditedItem)
+module ItemCreation exposing (addItem, deleteItem, itemCreationPageView, searchBarId, updateEditedItem)
 
 import Design exposing (backButton, colors)
 import Element exposing (Element, fill, height, px, shrink, width)
@@ -11,26 +11,16 @@ import Html exposing (Html)
 import Html.Attributes
 import Icons
 import Model.ModelTypes exposing (Item)
+import Model.Screen exposing (ItemCreationData)
 import Model.ShoppingList as ShoppingList exposing (ItemPresence(..), ShoppingList, ShoppingListID, pendingItems, shoppingListID)
 import Msg exposing (Msg(..))
+import Router
 import SimpleTextIndex exposing (Index)
 
 
-type alias ItemCreationData =
-    { shoppingListId : ShoppingListID
-    , itemInput : String
-    , editedItem : Item
-    , searchResults : List ( ItemPresence, Item )
-    }
-
-
-openItemCreator : ShoppingListID -> ItemCreationData
-openItemCreator shoppingListId =
-    { shoppingListId = shoppingListId
-    , itemInput = ""
-    , editedItem = ""
-    , searchResults = []
-    }
+searchBarId : String
+searchBarId =
+    "search-bar"
 
 
 updateEditedItem : String -> Index Item -> ShoppingList -> ItemCreationData -> ItemCreationData
@@ -193,11 +183,6 @@ itemView item itemPresence =
         ]
 
 
-searchBarId : String
-searchBarId =
-    "search-bar"
-
-
 searchBar : Item -> Element Msg
 searchBar editedItem =
     Element.row
@@ -236,7 +221,7 @@ headerView shoppingListID editedItem =
         , height (px 64)
         , Font.color colors.lime
         ]
-        [ backButton (SelectList shoppingListID)
+        [ backButton (Router.goToShoppingList shoppingListID)
         , searchBar editedItem
         , Element.el [ width (px 20) ] Element.none
         ]

@@ -12,6 +12,7 @@ import Html.Attributes
 import ListSelection
 import Model.ShoppingList exposing (ShoppingList)
 import Msg exposing (Msg(..))
+import Router
 
 
 backdrop : Element msg -> Element msg
@@ -116,7 +117,7 @@ buttonsRow editedList =
         , height (px 50)
         ]
         [ actionButton LeftCancel
-            { onPress = Just BackToListSelection
+            { onPress = Just Router.goToListSelection
             , label = Element.text "Cancel·la"
             }
         , actionButton RightAccept

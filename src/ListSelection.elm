@@ -10,6 +10,7 @@ import Element.Keyed as Keyed
 import Html exposing (Html)
 import Model.ShoppingList exposing (ShoppingList, listProgress, shoppingListID, shoppingListName)
 import Msg exposing (Msg(..))
+import Router
 
 
 progressBarView : Int -> Element msg
@@ -78,7 +79,7 @@ listThumbnailButtonView : ShoppingList -> Element Msg
 listThumbnailButtonView shoppingList =
     Input.button
         [ width fill, Element.focused [] ]
-        { onPress = Just (SelectList (shoppingListID shoppingList))
+        { onPress = Just (Router.goToShoppingList (shoppingListID shoppingList))
         , label = listThumbnailView shoppingList
         }
 
@@ -115,6 +116,6 @@ listSelectionPageView : List ShoppingList -> Html Msg
 listSelectionPageView lists =
     Element.layout
         [ Background.color colors.black
-        , floatingActionButton OpenListCreator
+        , floatingActionButton Router.goToListCreation
         ]
         (listSelectionView lists)
