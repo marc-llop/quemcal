@@ -5,22 +5,32 @@ import Dict exposing (values)
 import Element exposing (Attribute, Element, fill, fillPortion, height, px, shrink, width)
 import Element.Background as Background
 import Element.Border as Border
+import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import Html.Attributes
+import Html.Events exposing (onClick)
 import ListSelection
 import Model.ShoppingList exposing (ShoppingList)
 import Msg exposing (Msg(..))
 import Router
 
 
-backdrop : Element msg -> Element msg
+backdrop : Element Msg -> Element Msg
 backdrop child =
     Element.el
         [ width fill
         , height fill
         , Background.color colors.backdropBlack
+        , Element.behindContent
+            (Element.el
+                [ width fill
+                , height fill
+                , Events.onClick Router.goToListSelection
+                ]
+                Element.none
+            )
         ]
         child
 

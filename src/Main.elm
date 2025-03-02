@@ -229,8 +229,8 @@ update msg model =
                             newShoppingList listName
                     in
                     ( { model
-                        | screen = ShoppingList shoppingListName
-                        , shoppingLists = Dict.insert listName shoppingList model.shoppingLists
+                        -- | screen = ShoppingList shoppingListName
+                        | shoppingLists = Dict.insert listName shoppingList model.shoppingLists
                       }
                     , pushUrl model.key (Router.shoppingListUrl shoppingListName)
                     )
